@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import styles from './page.module.css';
-import { getTranslations } from '../../../lib/i18n';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
+import { getPage, getPillars } from '../../../lib/content';
+
+export const dynamic = 'force-dynamic';
 
 // TRACE icon SVGs
 const traceIcons = {
@@ -12,9 +13,15 @@ const traceIcons = {
   E: () => <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
 };
 
-export default function Services({ params: { locale } }) {
-  const t = getTranslations(locale);
-  const s = t.services;
+export default async function Services({ params: { locale } }) {
+  const isAr = locale === 'ar';
+  const [page, pillars] = await Promise.all([
+    getPage('services', locale),
+    getPillars(locale),
+  ]);
+
+  const traceChip = isAr ? 'منهجيتنا' : 'Our Methodology';
+  const introTitle = isAr ? 'إطار عمل TRACE' : 'The TRACE Framework';
 
   return (
     <div className={styles.page}>
@@ -23,45 +30,43 @@ export default function Services({ params: { locale } }) {
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
-          <div className={styles.heroChip}>
-            {s.servicesChip}
-          </div>
-          <h1 className={styles.heroTitle}>{s.heroTitle}</h1>
-          <p className={styles.heroSubtitle}>{s.heroSubtitle}</p>
+          {page?.heroBadge && <div className={styles.heroChip}>{page.heroBadge}</div>}
+          <h1 className={styles.heroTitle}>{page?.heroTitle || (isAr ? 'خدماتنا' : 'Our Services')}</h1>
+          <p className={styles.heroSubtitle}>{page?.heroSubtitle}</p>
         </div>
         <div className={styles.heroBar} />
       </section>
 
       {/* ── 2. INTRO ────────────────────────────────────────── */}
-      <section className={styles.intro}>
-        <div className="container">
-          <ScrollReveal animation="fadeUp">
-            <div className={styles.introInner}>
-              <span className={styles.chipTeal}>
-                {s.traceChip}
-              </span>
-              <h2 className={styles.sectionTitle}>{s.introTitle}</h2>
-              <div className={styles.goldBarCenter} />
-              <div className={styles.introText}>
-                {s.introText.split('\n\n').map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
+      {page?.introParagraphs?.length > 0 && (
+        <section className={styles.intro}>
+          <div className="container">
+            <ScrollReveal animation="fadeUp">
+              <div className={styles.introInner}>
+                <span className={styles.chipTeal}>{traceChip}</span>
+                <h2 className={styles.sectionTitle}>{introTitle}</h2>
+                <div className={styles.goldBarCenter} />
+                <div className={styles.introText}>
+                  {page.introParagraphs.map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
               </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
+            </ScrollReveal>
+          </div>
+        </section>
+      )}
 
       {/* ── 3. PILLARS (TRACE) ──────────────────────────────── */}
       <section className={styles.pillars}>
         <div className="container">
           <div className={styles.pillarsGrid}>
-            {s.pillars.map((pillar, idx) => {
+            {pillars.map((pillar, idx) => {
               const letter = pillar.letter || String.fromCharCode(84 + idx); // T R A C E
               const Icon = traceIcons[letter] || traceIcons['T'];
               return (
                 <ScrollReveal
-                  key={idx}
+                  key={pillar.id}
                   animation="fadeUp"
                   delay={`${(idx % 3) * 0.1}s`}
                   threshold={0.08}
@@ -73,10 +78,10 @@ export default function Services({ params: { locale } }) {
                       <Icon />
                     </div>
                     <h3 className={styles.pillarTitle}>{pillar.title}</h3>
-                    
+
                     <div className={styles.accordionWrapper}>
                       <div className={styles.accordionInner}>
-                        <p className={styles.pillarDesc}>{pillar.description}</p>
+                        <p className={styles.pillarDesc}>{pillar.desc}</p>
                         {pillar.keyAreas && pillar.keyAreas.length > 0 && (
                           <ul className={styles.keyAreasList}>
                             {pillar.keyAreas.map((area, i) => (
@@ -96,8 +101,6 @@ export default function Services({ params: { locale } }) {
           </div>
         </div>
       </section>
-
-
 
     </div>
   );

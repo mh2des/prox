@@ -1,14 +1,15 @@
-'use client';
-
 import styles from './page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
-import en from '../../../../messages/en.json';
-import ar from '../../../../messages/ar.json';
+import { getPage, getClients } from '../../../lib/content';
 
-export default function OurClients({ params: { locale } }) {
-  const t = locale === 'ar' ? ar : en;
-  const c = t.ourWork.clients;
+export const dynamic = 'force-dynamic';
+
+export default async function OurClients({ params: { locale } }) {
   const isAr = locale === 'ar';
+  const [page, clients] = await Promise.all([
+    getPage('our-clients', locale),
+    getClients(locale),
+  ]);
 
   return (
     <div className={styles.page} dir={isAr ? 'rtl' : 'ltr'}>
@@ -17,10 +18,10 @@ export default function OurClients({ params: { locale } }) {
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           <ScrollReveal animation="fadeUp">
-            <span className={styles.chipGold}>{c.chip}</span>
-            <h1 className={styles.heroTitle}>{c.heroTitle}</h1>
+            {page?.heroBadge && <span className={styles.chipGold}>{page.heroBadge}</span>}
+            <h1 className={styles.heroTitle}>{page?.heroTitle || (isAr ? 'عملاؤنا' : 'Our Clients')}</h1>
             <div className={styles.goldBarCenter} />
-            <p className={styles.heroSubtitle}>{c.heroSubtitle}</p>
+            <p className={styles.heroSubtitle}>{page?.heroSubtitle}</p>
           </ScrollReveal>
         </div>
         <div className={styles.heroBar} />
@@ -31,15 +32,19 @@ export default function OurClients({ params: { locale } }) {
         <div className="container">
           <ScrollReveal animation="scaleUp">
             <div className={styles.clientsGrid}>
-              {c.clientLogos?.map((client, i) => (
-                <div key={i} className={styles.clientCard}>
+              {clients.map((client) => (
+                <div key={client.id} className={styles.clientCard}>
                   <div className={styles.clientLogo}>
-                    {/* TODO: Use Next.js <Image /> for better performance */}
-                    <img
-                      src={client.image}
-                      alt={client.name}
-                      className={styles.clientImage}
-                    />
+                    {client.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={client.image}
+                        alt={client.name}
+                        className={styles.clientImage}
+                      />
+                    ) : (
+                      <span className={styles.clientName}>{client.name}</span>
+                    )}
                   </div>
                 </div>
               ))}
