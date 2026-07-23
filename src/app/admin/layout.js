@@ -1,3 +1,5 @@
+import './admin.css';
+
 // The /admin area is a separate, monolingual (English, LTR) document from the
 // public bilingual site. Because the root layout (src/app/layout.js) is a
 // passthrough, this layout renders its own <html>/<body>.
