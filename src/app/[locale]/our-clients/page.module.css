@@ -3,26 +3,27 @@
    ───────────────────────────────────────────────────────── */
 
 .page {
-  background: #0a1f1e;
+  background: #ffffff;
   min-height: 100vh;
-  color: #fff;
+  color: #121212;
 }
 
 /* ── HERO ──────────────────────────────────────────────── */
 .hero {
   position: relative;
   padding: 10rem 0 6rem;
-  background-color: #0d2929;
+  background-color: #139088;
   background-image: url('https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=2000&q=80');
   background-size: cover;
   background-position: center;
   overflow: hidden;
+  background-blend-mode: overlay;
 }
 
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(10,31,30,0.95) 0%, rgba(10,31,30,0.85) 100%);
+  background: linear-gradient(135deg, rgba(19,144,136,0.88) 0%, rgba(19,144,136,0.78) 100%);
 }
 
 .heroInner {
@@ -35,9 +36,9 @@
 
 .chipGold {
   display: inline-block;
-  background: rgba(197,160,89,0.15);
-  border: 1px solid rgba(197,160,89,0.35);
-  color: #c5a059;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #ffffff;
   padding: 0.4rem 1.2rem;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -59,14 +60,14 @@
 .goldBarCenter {
   width: 60px;
   height: 4px;
-  background: #c5a059;
+  background: #ffffff;
   margin: 0 auto 2.5rem;
   border-radius: 4px;
 }
 
 .heroSubtitle {
   font-size: clamp(1.1rem, 2vw, 1.25rem);
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.85);
   line-height: 1.8;
   margin: 0 auto;
 }
@@ -74,86 +75,102 @@
 /* ── CLIENTS GRID ──────────────────────────────────────── */
 .clientsSection {
   padding: 6rem 0 10rem;
-  background: #0a1f1e;
+  background: #ffffff;
 }
 
 .clientsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 2.5rem;
 }
 
 .clientCard {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 3rem 2rem;
+  background: #ffffff;
+  border: 2px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  min-height: 180px;
+  min-height: 220px;
   position: relative;
   overflow: hidden;
 }
 
-.clientCard::after {
+.clientCard::before {
   content: '';
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  width: 100%;
+  right: 0;
   height: 3px;
-  background: #c5a059;
+  background: #139088;
   transform: scaleX(0);
   transition: transform 0.4s ease;
   transform-origin: left;
 }
 
 .clientCard:hover {
-  transform: translateY(-10px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(197, 160, 89, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-8px);
+  background: #ffffff;
+  border-color: #139088;
+  box-shadow: 0 12px 32px rgba(19,144,136,0.15);
 }
 
-.clientCard:hover::after {
+.clientCard:hover::before {
   transform: scaleX(1);
 }
 
-.clientName {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 0.02em;
-}
-
-.clientLogoPlaceholder {
-  width: 60px;
-  height: 60px;
-  background: rgba(197, 160, 89, 0.1);
-  border-radius: 50%;
+.clientLogo {
+  width: 100%;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  color: #c5a059;
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f5f5f5;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.clientCard:hover .clientLogoPlaceholder {
-  background: #c5a059;
-  color: #fff;
-  transform: scale(1.1) rotate(10deg);
+.clientCard:hover .clientLogo {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e8f5f3 100%);
+  transform: scale(1.08) rotate(-1deg);
+  box-shadow: 0 12px 24px rgba(19,144,136,0.2);
+}
+
+.clientImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 0.5rem;
+  transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  filter: brightness(0.95) contrast(1) saturate(1);
+}
+
+.clientCard:hover .clientImage {
+  transform: scale(1.12) rotate(2deg);
+  filter: brightness(1.1) contrast(1.15) saturate(1.25) drop-shadow(0 4px 12px rgba(19,144,136,0.15));
 }
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .hero { padding: 8rem 0 4rem; }
   .clientsSection { padding: 4rem 0 6rem; }
-  .clientCard { padding: 2.5rem 1.5rem; }
+  .clientCard { padding: 1.5rem; min-height: 180px; }
+  .clientsGrid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 6rem 0 3rem; }
+  .heroTitle { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+  .heroSubtitle { font-size: 1rem; }
+  .clientsSection { padding: 2rem 0 3rem; }
+  .clientsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+  .clientCard { padding: 1rem; min-height: 150px; }
+  .clientLogo { height: 120px; }
 }

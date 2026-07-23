@@ -29,18 +29,22 @@ export default function OurClients({ params: { locale } }) {
       {/* ── CLIENTS GRID ────────────────────────────── */}
       <section className={styles.clientsSection}>
         <div className="container">
-          <div className={styles.clientsGrid}>
-            {c.names?.map((name, i) => (
-              <ScrollReveal key={i} animation="scaleUp" delay={`${i * 0.1}s`} threshold={0.1}>
-                <div className={styles.clientCard}>
-                  <div className={styles.clientLogoPlaceholder}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <ScrollReveal animation="scaleUp">
+            <div className={styles.clientsGrid}>
+              {c.clientLogos?.map((client, i) => (
+                <div key={i} className={styles.clientCard}>
+                  <div className={styles.clientLogo}>
+                    {/* TODO: Use Next.js <Image /> for better performance */}
+                    <img
+                      src={client.image}
+                      alt={client.name}
+                      className={styles.clientImage}
+                    />
                   </div>
-                  <h3 className={styles.clientName}>{name}</h3>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </div>

@@ -79,11 +79,12 @@ export default function Media({ params: { locale } }) {
             </div>
           </ScrollReveal>
 
-          <div className={styles.articlesGrid}>
-            {m.articles.map((article, idx) => (
-              <ScrollReveal key={idx} animation="fadeUp" delay={`${idx * 0.13}s`} threshold={0.1}>
-                <Link href="#" className={styles.articleCard}>
+          <ScrollReveal animation="fadeUp">
+            <div className={styles.articlesGrid}>
+              {m.articles.map((article, idx) => (
+                <Link key={idx} href="#" className={styles.articleCard}>
                   <div className={styles.articleImgWrap}>
+                    {/* TODO: Use Next.js <Image /> for better performance */}
                     <img
                       src={articleImages[idx]}
                       alt={article.title}
@@ -103,9 +104,9 @@ export default function Media({ params: { locale } }) {
                     </div>
                   </div>
                 </Link>
-              </ScrollReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

@@ -44,13 +44,13 @@ export default function WhoWeAre({ params: { locale } }) {
               </div>
             </ScrollReveal>
 
-            <div className={styles.whoRight}>
-              {w.paragraphs.map((para, i) => (
-                <ScrollReveal key={i} animation="fadeUp" delay={`${i * 0.12}s`}>
-                  <p className={styles.whoPara}>{para}</p>
-                </ScrollReveal>
-              ))}
-            </div>
+            <ScrollReveal animation="fadeUp">
+              <div className={styles.whoRight}>
+                {w.paragraphs.map((para, i) => (
+                  <p key={i} className={styles.whoPara}>{para}</p>
+                ))}
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>

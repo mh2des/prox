@@ -30,35 +30,12 @@ export default function OurWork({ params: { locale } }) {
         <div className={styles.heroBar} />
       </section>
 
-      {/* ── INTRO ────────────────────────────────────── */}
-      <section className={styles.intro}>
-        <div className="container">
-          <ScrollReveal animation="fadeUp">
-            <div className={styles.introInner}>
-              <h2 className={styles.sectionTitle}>{w.introTitle}</h2>
-              <div className={styles.goldBar} />
-              <p className={styles.introText}>{w.introText}</p>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
       {/* ── PROJECTS ──────────────────────────────────── */}
       <section className={styles.projects}>
-        <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-          {projects.map((project, index) => (
-            <ScrollReveal key={project.id} animation="fadeUp">
-              <div className={styles.templateCard}>
-                {project.image && (
-                  <div className={styles.projectImageWrapper}>
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className={styles.projectImage}
-                    />
-                  </div>
-                )}
-
+        <ScrollReveal animation="fadeUp">
+          <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+            {projects.map((project, index) => (
+              <div key={project.id} className={styles.templateCard}>
                 {/* Localized Meta Info */}
                 <div className={styles.metaGrid} style={{ marginBottom: '2.5rem' }}>
                   {[
@@ -83,10 +60,21 @@ export default function OurWork({ params: { locale } }) {
                     </p>
                   ))}
                 </div>
+
+                {project.image && (
+                  <div className={styles.projectImageWrapper}>
+                    {/* TODO: Use Next.js <Image /> for better performance */}
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className={styles.projectImage}
+                    />
+                  </div>
+                )}
               </div>
-            </ScrollReveal>
-          ))}
-        </div>
+            ))}
+          </div>
+        </ScrollReveal>
       </section>
 
     </div>

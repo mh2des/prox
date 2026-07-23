@@ -48,20 +48,14 @@ export default function Home({ params: { locale } }) {
             </ScrollReveal>
 
             {/* Right — slides up with slight delay */}
-            <div className={styles.whoRight}>
-              <ScrollReveal animation="fadeUp" delay="0.1s">
+            <ScrollReveal animation="fadeUp">
+              <div className={styles.whoRight}>
                 <p className={styles.whoPara}>{h.whoText1}</p>
-              </ScrollReveal>
-              <ScrollReveal animation="fadeUp" delay="0.22s">
                 <p className={styles.whoPara}>{h.whoText2}</p>
-              </ScrollReveal>
-              <ScrollReveal animation="fadeUp" delay="0.34s">
                 <p className={styles.whoPara}>{h.whoText3}</p>
-              </ScrollReveal>
-              <ScrollReveal animation="fadeUp" delay="0.46s">
                 <Link href={`/${locale}/who-we-are`} className={styles.btnPrimary}>{h.whoBtn}</Link>
-              </ScrollReveal>
-            </div>
+              </div>
+            </ScrollReveal>
 
           </div>
         </div>
@@ -79,15 +73,10 @@ export default function Home({ params: { locale } }) {
             </div>
           </ScrollReveal>
 
-          <div className={styles.traceGrid}>
-            {h.traceItems.map((item, idx) => (
-              <ScrollReveal
-                key={item.letter}
-                animation="fadeRight"
-                delay={`${idx * 0.12}s`}
-                threshold={0.1}
-              >
-                <div className={styles.traceCard}>
+          <ScrollReveal animation="fadeRight">
+            <div className={styles.traceGrid}>
+              {h.traceItems.map((item, idx) => (
+                <div key={item.letter} className={styles.traceCard}>
                   <div className={styles.traceLetter}>{item.letter}</div>
                   <div className={styles.traceBody}>
                     <div className={styles.traceLabel}>ProEx – {item.letter}</div>
@@ -95,9 +84,9 @@ export default function Home({ params: { locale } }) {
                     <p className={styles.traceDesc}>{item.description}</p>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" delay="0.3s">
             <div className={styles.centerAction}>

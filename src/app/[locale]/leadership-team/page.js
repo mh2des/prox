@@ -6,7 +6,7 @@ const leaders = [
     name:  'Dr. Khaled Hamood Al-Azab',
     title: 'Vice President of the Arab Volunteer Union',
     subtitle: 'Expert in Strategic Planning & Institutional Capacity Building',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
+    image: '/leadership-team/Dr. Khaled Hamood Al-Azab   1.jpeg',
     bio: 'An accomplished consultant and academic with over 18 years of experience in management, strategic planning, and organizational development. Holding a Ph.D. in "Administration and Planning," he has spearheaded major regional initiatives in collaboration with international organizations such as the UNDP and GIZ. Dr. Al-Azab specializes in designing institutional models, conflict resolution, and developing complex procedural manuals for the third sector and government entities across the GCC and the Arab world.',
     expertise: [
       'Strategic & Operational Planning',
@@ -24,7 +24,7 @@ const leaders = [
     name:  'Sumair Ahmed Watani',
     title: 'Business Development & Growth Marketing Director',
     subtitle: 'Export Strategy & Supply Chain Expert',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
+    image: '/leadership-team/Sumair Ahmed Watani   2.png',
     bio: 'A high-impact executive with over 20 years of global experience in crafting market penetration strategies, particularly within the KSA and Bahraini markets. Specializing in transforming commercial objectives into tangible results through digital transformation and product development, he has a proven track record of driving multimillion-dollar revenue growth. He excels in navigating GCC regulatory standards and managing complex supply chains for the FMCG sector.',
     expertise: [
       'KSA & GCC Market Penetration',
@@ -42,7 +42,7 @@ const leaders = [
     name:  'Sami Mohammed Ali',
     title: 'Manager of Grants & Capacity Building',
     subtitle: 'International Relations & Project Management Expert',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80',
+    image: '/leadership-team/Sami Mohammed Zeinelabdein Ali   3.png',
     bio: 'A dedicated professional with extensive experience in both the public and private sectors, specializing in donor relations and grant management. He possesses strong leadership skills in managing multi-national teams and overseeing large-scale projects with budgets exceeding $55 million. Mr. Ali is an expert in formulating organizational policies and procedures, combined with high-level diplomatic negotiation skills and official simultaneous interpretation capabilities.',
     expertise: [
       'Grant System Management & Partner Capacity Assessment',

@@ -23,10 +23,10 @@
     "heroTitle": "Empowering Institutions.",
     "heroHighlight": "Driving Sustainable Impact.",
     "heroSubtitle": "We partner with government entities, private sector leaders, and civil society organizations to design and deliver transformative institutional solutions.",
-    "whoTitle": "Who We Are",
-    "whoText1": "At ProEx for Consulting and Business Development w.L.L, we believe that institutional excellence is not accidental — it is engineered.",
-    "whoText2": "Headquartered in the Kingdom of Bahrain with a regional outlook, ProEx delivers integrated advisory solutions across governance, strategy, capacity development, communication, and institutional transformation.",
-    "whoText3": "Through our structured and results-driven approach, we help organizations strengthen systems, enhance performance, and achieve measurable impact.",
+    "whoTitle": "ProEx Consulting",
+    "whoText1": "ProEx for Consulting and Business Development w.L.L is a specialized consulting firm delivering integrated solutions in institutional development, governance, and strategic transformation.",
+    "whoText2": "We combine regional expertise with practical consulting experience to support organizations across government, private sector, and civil society in navigating complex challenges and achieving sustainable impact.",
+    "whoText3": "Our work is driven by a commitment to strengthening institutions, enhancing performance, and enabling long-term development outcomes. Through our integrated TRACE methodology, we design and deliver solutions that connect strategy with execution—transforming vision into measurable results.",
     "whoBtn": "Learn More",
     "traceTitle": "Our Integrated Model – TRACE",
     "traceSubtitle": "Our work is built around a comprehensive advisory framework that integrates five core capabilities:",
@@ -265,12 +265,27 @@
       "chip": "Our Clients",
       "heroTitle": "Success Partners",
       "heroSubtitle": "We take pride in partnering with leading institutions that share our vision for driving institutional excellence and sustainable impact across various sectors.",
-      "names": [
-        "BASS Foundation",
-        "Silah Development Foundation",
-        "Mustaqrah",
-        "Gulf University",
-        "Bahrain Human Rights Observatory"
+      "clientLogos": [
+        {
+          "name": "BASS Foundation",
+          "image": "/our-clients/WhatsApp Image 2026-03-29 at 8.18.31 AM.jpeg"
+        },
+        {
+          "name": "Silah Development Foundation",
+          "image": "/our-clients/WhatsApp Image 2026-03-29 at 8.18.31 AM (1).jpeg"
+        },
+        {
+          "name": "Mustaqrah",
+          "image": "/our-clients/WhatsApp Image 2026-03-29 at 8.18.31 AM (2).jpeg"
+        },
+        {
+          "name": "Gulf University",
+          "image": "/our-clients/WhatsApp Image 2026-03-29 at 8.18.31 AM.jpeg"
+        },
+        {
+          "name": "Bahrain Human Rights Observatory",
+          "image": "/our-clients/WhatsApp Image 2026-03-29 at 8.18.31 AM (1).jpeg"
+        }
       ]
     }
   }
