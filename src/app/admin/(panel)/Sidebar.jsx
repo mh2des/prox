@@ -9,23 +9,23 @@ const groups = [
     title: 'Content',
     items: [
       { href: '/admin/projects', label: 'Our Work' },
-      { href: '/admin/team', label: 'Team', soon: true },
-      { href: '/admin/clients', label: 'Clients', soon: true },
-      { href: '/admin/posts', label: 'Media Posts', soon: true },
+      { href: '/admin/team', label: 'Team' },
+      { href: '/admin/clients', label: 'Clients' },
+      { href: '/admin/posts', label: 'Media Posts' },
       { href: '/admin/pages', label: 'Pages', soon: true },
     ],
   },
   {
     title: 'Inbox',
     items: [
-      { href: '/admin/messages', label: 'Messages', soon: true },
-      { href: '/admin/jobs', label: 'Careers', soon: true },
-      { href: '/admin/applications', label: 'Applications', soon: true },
+      { href: '/admin/messages', label: 'Messages' },
+      { href: '/admin/jobs', label: 'Careers' },
+      { href: '/admin/applications', label: 'Applications' },
     ],
   },
   {
     title: 'System',
-    items: [{ href: '/admin/settings', label: 'Settings', soon: true }],
+    items: [{ href: '/admin/settings', label: 'Settings' }],
   },
 ];
 

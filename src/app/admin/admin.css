@@ -332,6 +332,77 @@
   color: var(--a-muted);
 }
 
+/* ── Rich text editor ── */
+.rte {
+  border: 1px solid var(--a-border-strong);
+  border-radius: var(--a-radius-sm);
+  background: var(--a-bg3);
+  overflow: hidden;
+}
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid var(--a-border);
+  background: var(--a-bg2);
+}
+.rte-btn {
+  min-width: 30px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--a-border);
+  background: transparent;
+  color: var(--a-dim);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.rte-btn:hover {
+  color: var(--a-text);
+  background: var(--a-bg4);
+}
+.rte-btn.active {
+  color: var(--a-primary-light);
+  border-color: var(--a-primary);
+  background: var(--a-primary-ghost);
+}
+.rte-content {
+  min-height: 160px;
+  padding: 14px 16px;
+  color: var(--a-text);
+  font-size: 14px;
+  line-height: 1.6;
+  outline: none;
+}
+.rte-content:focus {
+  outline: none;
+}
+.rte-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+.rte-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+.rte-content p {
+  margin: 0 0 10px;
+}
+.rte-content ul,
+.rte-content ol {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+.rte-content blockquote {
+  border-left: 3px solid var(--a-primary);
+  padding-left: 12px;
+  color: var(--a-dim);
+  margin: 0 0 10px;
+}
+
 @media (max-width: 640px) {
   .admin-sidebar {
     display: none;
