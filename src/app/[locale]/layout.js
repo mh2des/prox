@@ -6,10 +6,28 @@ import Footer from '../../components/layout/Footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-primary' });
 
-export const metadata = {
-  title: 'ProEx | Premium Consulting & Business Development',
-  description: 'ProEx offers integrated global expertise and hands-on business experience. Partnering with you for strategy, transformation, marketing, and more.',
-};
+export async function generateMetadata({ params: { locale } }) {
+  const isAr = locale === 'ar';
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  return {
+    metadataBase: new URL(base),
+    title: isAr
+      ? 'بروإكس | الاستشارات وتطوير الأعمال'
+      : 'ProEx | Premium Consulting & Business Development',
+    description: isAr
+      ? 'بروإكس تقدّم حلولاً متكاملة في التطوير المؤسسي والحوكمة والتحول الاستراتيجي في مملكة البحرين والمنطقة.'
+      : 'ProEx delivers integrated solutions in institutional development, governance, and strategic transformation across Bahrain and the region.',
+    alternates: {
+      languages: { en: `${base}/en`, ar: `${base}/ar` },
+    },
+    openGraph: {
+      title: isAr ? 'بروإكس للاستشارات وتطوير الأعمال' : 'ProEx | Premium Consulting & Business Development',
+      description: isAr ? 'الاستشارات وتطوير الأعمال' : 'Premium Consulting & Business Development',
+      type: 'website',
+      locale: isAr ? 'ar_BH' : 'en_US',
+    },
+  };
+}
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'ar' }];
