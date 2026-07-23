@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
+import UploadField from '@/components/admin/UploadField';
 
 function SubmitButton({ label }) {
   const { pending } = useFormStatus();
@@ -70,7 +71,7 @@ export default function TeamMemberForm({ action, member }) {
       <div className="form-row">
         <div className="field">
           <label className="field-label">Photo URL</label>
-          <input name="photoUrl" className="input" placeholder="/team/... or https://..." defaultValue={m.photoUrl || ''} />
+          <UploadField name="photoUrl" defaultValue={m.photoUrl || ''} endpoint="image" />
         </div>
         <div className="field">
           <label className="field-label">LinkedIn</label>

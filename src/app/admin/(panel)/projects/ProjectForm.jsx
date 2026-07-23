@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
+import UploadField from '@/components/admin/UploadField';
 
 function SubmitButton({ label }) {
   const { pending } = useFormStatus();
@@ -74,9 +75,8 @@ export default function ProjectForm({ action, project }) {
       </div>
 
       <div className="field">
-        <label className="field-label">Image URL</label>
-        <input name="imageUrl" className="input" placeholder="/0urwork/... or https://..." defaultValue={p.imageUrl || ''} />
-        <span className="field-hint">Direct upload is coming next; for now paste an image path or URL.</span>
+        <label className="field-label">Image</label>
+        <UploadField name="imageUrl" defaultValue={p.imageUrl || ''} endpoint="image" />
       </div>
 
       <div className="field">

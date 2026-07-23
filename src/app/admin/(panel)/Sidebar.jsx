@@ -12,7 +12,17 @@ const groups = [
       { href: '/admin/team', label: 'Team' },
       { href: '/admin/clients', label: 'Clients' },
       { href: '/admin/posts', label: 'Media Posts' },
-      { href: '/admin/pages', label: 'Pages', soon: true },
+    ],
+  },
+  {
+    title: 'Pages & Sections',
+    items: [
+      { href: '/admin/pages', label: 'Pages' },
+      { href: '/admin/principles', label: 'Vision / Mission / Values' },
+      { href: '/admin/stats', label: 'Homepage Stats' },
+      { href: '/admin/sectors', label: 'Sectors' },
+      { href: '/admin/pillars', label: 'Services (TRACE)' },
+      { href: '/admin/offices', label: 'Offices' },
     ],
   },
   {

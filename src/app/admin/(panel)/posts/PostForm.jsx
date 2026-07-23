@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
 import RichTextEditor from '@/components/admin/RichTextEditor';
+import UploadField from '@/components/admin/UploadField';
 
 function SubmitButton({ label }) {
   const { pending } = useFormStatus();
@@ -71,7 +72,7 @@ export default function PostForm({ action, post }) {
         </div>
         <div className="field">
           <label className="field-label">Featured image URL</label>
-          <input name="featuredImage" className="input" placeholder="/media/... or https://..." defaultValue={p.featuredImage || ''} />
+          <UploadField name="featuredImage" defaultValue={p.featuredImage || ''} endpoint="image" />
         </div>
       </div>
 

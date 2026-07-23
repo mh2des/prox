@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
+import UploadField from '@/components/admin/UploadField';
 
 function SubmitButton({ label }) {
   const { pending } = useFormStatus();
@@ -47,7 +48,7 @@ export default function ClientForm({ action, client }) {
 
       <div className="field">
         <label className="field-label">Logo URL</label>
-        <input name="logoUrl" className="input" placeholder="https://..." defaultValue={c.logoUrl || ''} />
+        <UploadField name="logoUrl" defaultValue={c.logoUrl || ''} endpoint="image" />
         <span className="field-hint">paste a logo URL for now</span>
       </div>
 

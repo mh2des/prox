@@ -9,10 +9,10 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      // UploadThing-hosted uploads
+      { protocol: 'https', hostname: 'utfs.io' },
+      { protocol: 'https', hostname: '**.ufs.sh' },
     ],
   },
 };

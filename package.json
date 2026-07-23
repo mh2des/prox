@@ -24,6 +24,7 @@
     "@tiptap/pm": "^3.28.0",
     "@tiptap/react": "^3.28.0",
     "@tiptap/starter-kit": "^3.28.0",
+    "@uploadthing/react": "^7.3.3",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^12.36.0",
     "lucide-react": "^0.577.0",
@@ -32,6 +33,7 @@
     "next-intl": "^4.8.3",
     "react": "^18",
     "react-dom": "^18",
+    "uploadthing": "^7.7.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {

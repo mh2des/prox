@@ -1,3 +1,4 @@
+import '@uploadthing/react/styles.css';
 import './admin.css';
 
 // The /admin area is a separate, monolingual (English, LTR) document from the

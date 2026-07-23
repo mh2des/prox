@@ -403,6 +403,40 @@
   margin: 0 0 10px;
 }
 
+/* ── Upload field ── */
+.upload-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.upload-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--a-radius-sm);
+  border: 1px solid var(--a-border-strong);
+}
+/* Tame UploadThing's default button to fit the dark theme */
+.upload-field [data-ut-element='button'],
+.upload-field .ut-button {
+  background: var(--a-primary) !important;
+  color: #fff !important;
+  font-size: 13px;
+  height: auto;
+  padding: 8px 14px;
+}
+.upload-field [data-ut-element='allowed-content'],
+.upload-field .ut-allowed-content {
+  color: var(--a-muted);
+  font-size: 11px;
+}
+
 @media (max-width: 640px) {
   .admin-sidebar {
     display: none;
