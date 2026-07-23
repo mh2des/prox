@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import styles from "./ValuesInfographic.module.css";
 
-const values = [
+const FALLBACK_VALUES = [
   { num: "01", label: "Integrity",     icon: "⚖", desc: "We uphold the highest standards of honesty, ethics, and professional conduct." },
   { num: "02", label: "Excellence",    icon: "★", desc: "We pursue quality and continuous improvement in all we do." },
   { num: "03", label: "Collaboration", icon: "⟳", desc: "We value partnerships, mutual respect, and shared success." },
@@ -19,9 +19,19 @@ const DOT_POSITIONS = [
   { cx: 170, cy: 505 },
 ];
 
-export default function ValuesInfographic() {
+export default function ValuesInfographic({ values }) {
   const [inView, setInView] = useState(false);
   const ref = useRef(null);
+
+  const items =
+    values && values.length
+      ? values.map((v, i) => ({
+          num: String(i + 1).padStart(2, "0"),
+          label: v.title || "",
+          icon: v.icon || FALLBACK_VALUES[i % FALLBACK_VALUES.length].icon,
+          desc: v.text || "",
+        }))
+      : FALLBACK_VALUES;
 
   useEffect(() => {
     const el = ref.current;
@@ -69,7 +79,7 @@ export default function ValuesInfographic() {
       </svg>
 
       <div className={styles.cards}>
-        {values.map((v, i) => (
+        {items.map((v, i) => (
           <div key={i} className={styles.cardRow} style={{ "--delay": `${i * 0.14 + 0.3}s` }}>
             <div className={styles.iconCircle}>
               <span className={styles.iconGlyph}>{v.icon}</span>

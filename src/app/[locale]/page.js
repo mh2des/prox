@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import styles from './page.module.css';
 import { getTranslations } from '../../lib/i18n';
+import { getPage, getStats, getSectors, getPillars } from '../../lib/content';
 import ScrollReveal from '../../components/ui/ScrollReveal';
+
+export const dynamic = 'force-dynamic';
 
 // ── Sector icons ────────────────────────────────────────────
 const GovIcon  = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg>;
@@ -9,9 +12,17 @@ const PrivIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height
 const CivIcon  = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const sectorIcons = [GovIcon, PrivIcon, CivIcon];
 
-export default function Home({ params: { locale } }) {
+export default async function Home({ params: { locale } }) {
   const t = getTranslations(locale);
   const h = t.home;
+
+  // DB-backed sections (localized, Arabic->English fallback handled in the data layer)
+  const [page, stats, sectors, pillars] = await Promise.all([
+    getPage('home', locale),
+    getStats(locale),
+    getSectors(locale),
+    getPillars(locale),
+  ]);
 
   return (
     <div className={styles.home}>
@@ -23,10 +34,10 @@ export default function Home({ params: { locale } }) {
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroLabel}>ProEx Advisory</div>
           <h1 className={styles.heroTitle}>
-            {h.heroTitle}<br />
+            {page?.heroTitle || h.heroTitle}<br />
             <span className={styles.heroHighlight}>{h.heroHighlight}</span>
           </h1>
-          <p className={styles.heroSubtitle}>{h.heroSubtitle}</p>
+          <p className={styles.heroSubtitle}>{page?.heroSubtitle || h.heroSubtitle}</p>
           <div className={styles.heroActions}>
             <Link href={`/${locale}/contact`} className={styles.heroBtnPrimary}>Contact Us</Link>
             <Link href={`/${locale}/who-we-are`}   className={styles.heroBtnOutline}>Who We Are</Link>
@@ -75,13 +86,13 @@ export default function Home({ params: { locale } }) {
 
           <ScrollReveal animation="fadeRight">
             <div className={styles.traceGrid}>
-              {h.traceItems.map((item, idx) => (
-                <div key={item.letter} className={styles.traceCard}>
+              {pillars.map((item) => (
+                <div key={item.id} className={styles.traceCard}>
                   <div className={styles.traceLetter}>{item.letter}</div>
                   <div className={styles.traceBody}>
                     <div className={styles.traceLabel}>ProEx – {item.letter}</div>
                     <h3 className={styles.traceTitle}>{item.title}</h3>
-                    <p className={styles.traceDesc}>{item.description}</p>
+                    <p className={styles.traceDesc}>{item.desc || ''}</p>
                   </div>
                 </div>
               ))}
@@ -109,11 +120,11 @@ export default function Home({ params: { locale } }) {
           </ScrollReveal>
 
           <div className={styles.sectorGrid}>
-            {h.sectors.map((sector, idx) => {
-              const Icon = sectorIcons[idx];
+            {sectors.map((sector, idx) => {
+              const Icon = sectorIcons[idx % sectorIcons.length];
               return (
                 <ScrollReveal
-                  key={idx}
+                  key={sector.id}
                   animation="scaleUp"
                   delay={`${idx * 0.15}s`}
                   threshold={0.1}
@@ -121,7 +132,7 @@ export default function Home({ params: { locale } }) {
                   <div className={styles.sectorCard}>
                     <div className={styles.sectorIcon}><Icon /></div>
                     <h3 className={styles.sectorTitle}>{sector.title}</h3>
-                    <p className={styles.sectorDesc}>{sector.description}</p>
+                    <p className={styles.sectorDesc}>{sector.desc || ''}</p>
                   </div>
                 </ScrollReveal>
               );
@@ -147,18 +158,13 @@ export default function Home({ params: { locale } }) {
             {/* Right stats — slide from right */}
             <ScrollReveal animation="fadeRight" delay="0.15s" threshold={0.15}>
               <div className={styles.statPanel}>
-                {[
-                  { num: '50+', label: 'Institutions Served' },
-                  { num: '12+', label: 'Years of Impact' },
-                  { num: '5',   label: 'Core Capabilities' },
-                  { num: '3',   label: 'Sectors We Serve' },
-                ].map((s, i) => (
-                  <div key={i}>
+                {stats.map((s, i) => (
+                  <div key={s.id}>
                     <div className={styles.statItem}>
-                      <span className={styles.statNum}>{s.num}</span>
-                      <span className={styles.statLabel}>{s.label}</span>
+                      <span className={styles.statNum}>{s.value || ''}</span>
+                      <span className={styles.statLabel}>{s.label || ''}</span>
                     </div>
-                    {i < 3 && <div className={styles.statDivider} />}
+                    {i < stats.length - 1 && <div className={styles.statDivider} />}
                   </div>
                 ))}
               </div>

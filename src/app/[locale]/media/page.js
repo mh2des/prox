@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import styles from './page.module.css';
 import { getTranslations } from '../../../lib/i18n';
+import { getPublishedPosts } from '../../../lib/content';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
+
+export const dynamic = 'force-dynamic';
 
 const articleImages = [
   'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
@@ -9,16 +12,73 @@ const articleImages = [
   'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
 ];
 
+// Decorative fallback used only when a post has no featuredImage.
+const featuredFallbackImg =
+  'https://images.unsplash.com/photo-1554469384-e58fac16e23a?auto=format&fit=crop&w=1200&q=80';
+
+function formatDate(date, locale) {
+  if (!date) return '';
+  try {
+    return new Date(date).toLocaleDateString(locale === 'ar' ? 'ar' : 'en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch {
+    return '';
+  }
+}
+
 const ArrowIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
 );
 
-export default function Media({ params: { locale } }) {
+export default async function Media({ params: { locale } }) {
   const t = getTranslations(locale);
   const m = t.media;
   const readMore = locale === 'ar' ? 'اقرأ المزيد' : 'Read More';
+
+  // ── DB: published media posts ──
+  const posts = await getPublishedPosts(locale);
+  const hasPosts = Array.isArray(posts) && posts.length > 0;
+  const featuredPost = hasPosts ? posts[0] : null;
+  const gridPosts = hasPosts ? posts.slice(1) : [];
+
+  // Featured card data — from DB when available, else the inline fallback.
+  const featured = featuredPost
+    ? {
+        title: featuredPost.title || '',
+        excerpt: featuredPost.excerpt || '',
+        href: `/${locale}/media/${featuredPost.slug}`,
+        image: featuredPost.featuredImage || featuredFallbackImg,
+        date: formatDate(featuredPost.publishedAt, locale) || (locale === 'ar' ? '15 أكتوبر 2023' : 'October 15, 2023'),
+      }
+    : {
+        title: m.featuredTitle,
+        excerpt: m.featuredExcerpt,
+        href: '#',
+        image: featuredFallbackImg,
+        date: locale === 'ar' ? '15 أكتوبر 2023' : 'October 15, 2023',
+      };
+
+  // Latest-articles grid — DB posts (excluding the featured) or the inline fallback.
+  const gridItems = hasPosts
+    ? gridPosts.map((p, idx) => ({
+        key: p.slug,
+        title: p.title || '',
+        description: p.excerpt || '',
+        href: `/${locale}/media/${p.slug}`,
+        image: p.featuredImage || articleImages[idx % articleImages.length],
+      }))
+    : m.articles.map((article, idx) => ({
+        key: idx,
+        title: article.title,
+        description: article.description,
+        href: '#',
+        image: articleImages[idx % articleImages.length],
+      }));
 
   return (
     <div className={styles.page}>
@@ -43,8 +103,8 @@ export default function Media({ params: { locale } }) {
             <div className={styles.featuredCard}>
               <div className={styles.featuredImgWrap}>
                 <img
-                  src="https://images.unsplash.com/photo-1554469384-e58fac16e23a?auto=format&fit=crop&w=1200&q=80"
-                  alt={m.featuredTitle}
+                  src={featured.image}
+                  alt={featured.title}
                   className={styles.featuredImg}
                 />
                 <div className={styles.featuredImgOverlay} />
@@ -53,11 +113,11 @@ export default function Media({ params: { locale } }) {
               <div className={styles.featuredContent}>
                 <div className={styles.featuredMeta}>
                   <span className={styles.metaDot} />
-                  {locale === 'ar' ? '15 أكتوبر 2023' : 'October 15, 2023'}
+                  {featured.date}
                 </div>
-                <h2 className={styles.featuredTitle}>{m.featuredTitle}</h2>
-                <p className={styles.featuredExcerpt}>{m.featuredExcerpt}</p>
-                <Link href="#" className={styles.featuredBtn}>
+                <h2 className={styles.featuredTitle}>{featured.title}</h2>
+                <p className={styles.featuredExcerpt}>{featured.excerpt}</p>
+                <Link href={featured.href} className={styles.featuredBtn}>
                   {m.featuredBtn} <ArrowIcon />
                 </Link>
               </div>
@@ -81,12 +141,12 @@ export default function Media({ params: { locale } }) {
 
           <ScrollReveal animation="fadeUp">
             <div className={styles.articlesGrid}>
-              {m.articles.map((article, idx) => (
-                <Link key={idx} href="#" className={styles.articleCard}>
+              {gridItems.map((article) => (
+                <Link key={article.key} href={article.href} className={styles.articleCard}>
                   <div className={styles.articleImgWrap}>
                     {/* TODO: Use Next.js <Image /> for better performance */}
                     <img
-                      src={articleImages[idx]}
+                      src={article.image}
                       alt={article.title}
                       className={styles.articleImg}
                     />

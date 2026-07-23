@@ -3,13 +3,32 @@ import styles from '../about/page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import VMVSplitCard from '../../../components/ui/VMVSplitCard';
 import ValuesInfographic from '../../../components/ui/ValuesInfographic';
+import { getPage, getPrinciples } from '../../../lib/content';
 import en from '../../../../messages/en.json';
 import ar from '../../../../messages/ar.json';
 
-export default function WhoWeAre({ params: { locale } }) {
+export const dynamic = 'force-dynamic';
+
+export default async function WhoWeAre({ params: { locale } }) {
   const t = locale === 'ar' ? ar : en;
   const w = t.ourWork.who;
   const isAr = locale === 'ar';
+
+  const [page, principles] = await Promise.all([
+    getPage('who-we-are', locale),
+    getPrinciples(locale),
+  ]);
+
+  const heroTitle =
+    page?.heroTitle ||
+    (isAr ? 'شركاء استراتيجيون للتحول المؤسسي' : 'Strategic Partners for\nInstitutional Transformation');
+  const heroSubtitle =
+    page?.heroSubtitle ||
+    (isAr
+      ? 'نجمع بين التحليل الدقيق والتنفيذ العملي وأطر الأثر المستدام.'
+      : 'Combining rigorous analysis, practical implementation, and sustainable impact frameworks.');
+  const introParagraphs =
+    page?.introParagraphs?.length ? page.introParagraphs : w.paragraphs;
 
   return (
     <div className={styles.page} dir={isAr ? 'rtl' : 'ltr'}>
@@ -19,12 +38,10 @@ export default function WhoWeAre({ params: { locale } }) {
         <div className={`container ${styles.heroInner}`}>
 
           <h1 className={styles.heroTitle}>
-            {isAr ? 'شركاء استراتيجيون للتحول المؤسسي' : 'Strategic Partners for\nInstitutional Transformation'}
+            {heroTitle}
           </h1>
           <p className={styles.heroSubtitle}>
-            {isAr
-              ? 'نجمع بين التحليل الدقيق والتنفيذ العملي وأطر الأثر المستدام.'
-              : 'Combining rigorous analysis, practical implementation, and sustainable impact frameworks.'}
+            {heroSubtitle}
           </p>
         </div>
         <div className={styles.heroBar} />
@@ -46,7 +63,7 @@ export default function WhoWeAre({ params: { locale } }) {
 
             <ScrollReveal animation="fadeUp">
               <div className={styles.whoRight}>
-                {w.paragraphs.map((para, i) => (
+                {introParagraphs.map((para, i) => (
                   <p key={i} className={styles.whoPara}>{para}</p>
                 ))}
               </div>
@@ -69,7 +86,7 @@ export default function WhoWeAre({ params: { locale } }) {
           </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" threshold={0.12}>
-            <VMVSplitCard />
+            <VMVSplitCard vision={principles.vision} mission={principles.mission} />
           </ScrollReveal>
         </div>
       </section>
@@ -88,7 +105,7 @@ export default function WhoWeAre({ params: { locale } }) {
           </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" delay="0.1s" threshold={0.08}>
-            <ValuesInfographic />
+            <ValuesInfographic values={principles.values} />
           </ScrollReveal>
         </div>
       </section>

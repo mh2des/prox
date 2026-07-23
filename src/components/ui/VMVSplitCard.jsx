@@ -4,7 +4,15 @@ import Image from "next/image";
 import { useState } from "react";
 import styles from "./VMVSplitCard.module.css";
 
-export default function VMVSplitCard() {
+export default function VMVSplitCard({ vision, mission }) {
+  const visionTitle =
+    vision?.title || "Shaping Institutional Excellence Across the Region";
+  const missionTitle =
+    mission?.title || "Driving Measurable Outcomes for Visionary Institutions";
+  const missionText =
+    mission?.text ||
+    "To partner with visionary leaders and institutions, offering integrated advisory solutions that strengthen governance, enhance performance, and foster resilient and future-ready organizations.";
+
   return (
     <div className={styles.card}>
 
@@ -12,7 +20,7 @@ export default function VMVSplitCard() {
       <div className={styles.left}>
         <p className={styles.panelChip}>Vision</p>
         <h3 className={styles.panelTitle}>
-          Shaping Institutional Excellence Across the Region
+          {visionTitle}
         </h3>
         <div className={styles.goldBar} />
       </div>
@@ -35,13 +43,11 @@ export default function VMVSplitCard() {
       <div className={styles.right}>
         <p className={styles.panelChipWhite}>Mission</p>
         <h3 className={styles.panelTitleWhite}>
-          Driving Measurable Outcomes for Visionary Institutions
+          {missionTitle}
         </h3>
         <div className={styles.goldBarSmall} />
         <p className={styles.panelTextWhite}>
-          To partner with visionary leaders and institutions, offering integrated
-          advisory solutions that strengthen governance, enhance performance, and
-          foster resilient and future-ready organizations.
+          {missionText}
         </p>
 
         <div className={styles.missionStats}>
