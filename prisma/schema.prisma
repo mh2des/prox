@@ -1,0 +1,274 @@
+// ProEx — database schema.
+// Postgres (Neon) + Prisma. Bilingual public content uses per-locale columns (…En / …Ar).
+// Arabic (…Ar) fields are optional so we can launch and fill them in via the admin later.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection (…-pooler host) for app runtime
+  directUrl = env("DIRECT_URL") // direct connection for prisma migrate / introspection
+}
+
+// ───────────────────────────── ENUMS ─────────────────────────────
+enum AdminRole {
+  ADMIN
+  EDITOR
+  VIEWER
+  MANAGER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PublishStatus {
+  PUBLISHED
+  DRAFT
+}
+
+enum JobType {
+  JOB_OPENING
+  INTERNSHIP
+}
+
+enum JobStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum ApplicationStatus {
+  NEW
+  REVIEWED
+}
+
+enum PrincipleType {
+  VISION
+  MISSION
+  VALUE
+}
+
+// ─────────────────────── BACK-OFFICE AUTH (Users) ───────────────────────
+model AdminUser {
+  id           String     @id @default(cuid())
+  name         String
+  username     String     @unique
+  email        String     @unique
+  passwordHash String // bcrypt/argon2 — never plaintext
+  role         AdminRole  @default(EDITOR)
+  status       UserStatus @default(ACTIVE)
+  profilePhoto String? // uploaded image URL
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// ─────────────────────────── PUBLIC CONTENT ───────────────────────────
+model Project {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  titleEn     String
+  titleAr     String?
+  descEn      String    @db.Text
+  descAr      String?   @db.Text
+  sector      String?
+  client      String?
+  year        String?
+  location    String?
+  projectDate DateTime?
+  imageUrl    String?
+  published   Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model TeamMember {
+  id           String   @id @default(cuid())
+  name         String
+  positionEn   String
+  positionAr   String?
+  bioEn        String?  @db.Text
+  bioAr        String?  @db.Text
+  expertiseEn  String[] // bullet lists shown in the detail modal
+  expertiseAr  String[]
+  experienceEn String[]
+  experienceAr String[]
+  photoUrl     String?
+  linkedin     String?
+  published    Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  descEn    String?  @db.Text
+  descAr    String?  @db.Text
+  website   String?
+  logoUrl   String?
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  titleEn       String
+  titleAr       String?
+  excerptEn     String?       @db.Text
+  excerptAr     String?       @db.Text
+  contentEn     String?       @db.Text // sanitized HTML from the rich-text editor
+  contentAr     String?       @db.Text // sanitized HTML from the rich-text editor
+  author        String?
+  status        PublishStatus @default(DRAFT)
+  featuredImage String?
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  title     String?
+  fileUrl   String
+  mimeType  String?
+  fileSize  Int? // bytes
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────── FORMS / INBOX ───────────────────────────
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  body      String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  titleEn        String
+  titleAr        String?
+  department     String
+  type           JobType       @default(JOB_OPENING)
+  descriptionEn  String        @db.Text
+  descriptionAr  String?       @db.Text
+  requirementsEn String        @db.Text
+  requirementsAr String?       @db.Text
+  location       String?
+  status         JobStatus     @default(ACTIVE)
+  applications   Application[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Application {
+  id        String            @id @default(cuid())
+  job       Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId     String
+  fullName  String
+  email     String
+  phone     String?
+  cvUrl     String? // uploaded résumé (PDF/doc) URL
+  message   String?           @db.Text
+  status    ApplicationStatus @default(NEW)
+  createdAt DateTime          @default(now())
+}
+
+// ───────────────────────── SITE SETTINGS (singleton) ─────────────────────────
+model Setting {
+  id                 Int      @id @default(1) // single row
+  companyName        String   @default("ProEx")
+  adminEmail         String   @default("admin@proex.com")
+  companyDescEn      String?  @db.Text
+  companyDescAr      String?  @db.Text
+  timezone           String   @default("Asia/Bahrain")
+  defaultLanguage    String   @default("en")
+  sessionTimeoutMins Int      @default(30)
+  maxLoginAttempts   Int      @default(5)
+  emailNotifications Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
+}
+
+// ─────────── MARKETING PAGE CONTENT (typed models → dedicated admin forms) ───────────
+
+model Page {
+  slug           String   @id // "home" | "who-we-are" | "services" | "media" |
+  // "careers" | "contact" | "our-work" |
+  // "our-clients" | "leadership-team"
+  heroBadgeEn    String?
+  heroBadgeAr    String?
+  heroTitleEn    String?
+  heroTitleAr    String?
+  heroSubtitleEn String?  @db.Text
+  heroSubtitleAr String?  @db.Text
+  introEn        String?  @db.Text // section intro / body paragraphs
+  introAr        String?  @db.Text
+  heroImageUrl   String?
+  updatedAt      DateTime @updatedAt
+}
+
+model Stat {
+  id        String  @id @default(cuid())
+  valueEn   String // "50+", "12+", "5", "3"
+  valueAr   String?
+  labelEn   String // "Institutions Served"
+  labelAr   String?
+  sortOrder Int     @default(0)
+}
+
+model Sector {
+  id        String  @id @default(cuid())
+  titleEn   String
+  titleAr   String?
+  descEn    String? @db.Text
+  descAr    String? @db.Text
+  sortOrder Int     @default(0)
+}
+
+model ServicePillar {
+  id         String   @id @default(cuid())
+  letter     String // "T" "R" "A" "C" "E"
+  titleEn    String
+  titleAr    String?
+  descEn     String   @db.Text
+  descAr     String?  @db.Text
+  keyAreasEn String[] // bullet list shown on the services page
+  keyAreasAr String[]
+  sortOrder  Int      @default(0)
+}
+
+model Principle {
+  id        String        @id @default(cuid())
+  type      PrincipleType
+  titleEn   String
+  titleAr   String?
+  textEn    String        @db.Text
+  textAr    String?       @db.Text
+  icon      String? // icon key, used for the 5 values
+  sortOrder Int           @default(0)
+}
+
+model Office {
+  id        String  @id @default(cuid())
+  cityEn    String
+  cityAr    String?
+  addressEn String  @db.Text
+  addressAr String? @db.Text
+  mapsUrl   String?
+  phone     String?
+  email     String?
+  sortOrder Int     @default(0)
+}
