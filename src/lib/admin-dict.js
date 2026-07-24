@@ -388,7 +388,7 @@ export const DICT = {
     'dash.needsReview': 'بحاجة إلى مراجعة',
     'dash.allReviewed': 'تمت مراجعة الكل',
     'dash.ctx.portfolio': 'ضمن أعمالك',
-    'dash.ctx.team': 'أعضاء الفريق',
+    'dash.ctx.team': 'أفراد فريقك',
     'dash.ctx.clients': 'جهات العملاء',
     'dash.ctx.jobs': 'مفتوحة حالياً',
     'kpi.postsSplit': '{pub} منشور · {draft} مسودة',

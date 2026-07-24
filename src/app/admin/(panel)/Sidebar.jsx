@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { makeT } from '@/lib/admin-dict';
@@ -50,25 +50,54 @@ export default function Sidebar({ locale = 'en', user, signOutSlot }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const t = makeT(locale);
+  const asideRef = useRef(null);
+  const toggleRef = useRef(null);
+  const closeRef = useRef(null);
 
-  // Close the drawer whenever the route changes (a nav item was tapped).
+  // Explicit close (Escape / overlay / × button) returns focus to the toggle.
+  const closeDrawer = useCallback(() => {
+    setOpen(false);
+    toggleRef.current?.focus();
+  }, []);
+
+  // Close the drawer whenever the route changes (a nav item was tapped). No
+  // focus restore here — the user has navigated to a new page.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  // Close on Escape; lock body scroll while the mobile drawer is open.
+  // While the mobile drawer is open: move focus in, lock scroll, close on
+  // Escape, and trap Tab inside the drawer (WAI-ARIA dialog pattern).
   useEffect(() => {
     if (!open) return;
+    closeRef.current?.focus();
+    document.body.style.overflow = 'hidden';
     const onKey = (e) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        closeDrawer();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const nodes = asideRef.current?.querySelectorAll(
+        'a[href], button:not([disabled])'
+      );
+      if (!nodes || nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
     };
-  }, [open]);
+  }, [open, closeDrawer]);
 
   const settingsActive = pathname.startsWith('/admin/settings');
 
@@ -76,6 +105,7 @@ export default function Sidebar({ locale = 'en', user, signOutSlot }) {
     <>
       {/* Mobile-only hamburger; hidden on desktop via CSS. */}
       <button
+        ref={toggleRef}
         type="button"
         className="admin-mobile-toggle"
         aria-label={t('openMenu')}
@@ -89,21 +119,28 @@ export default function Sidebar({ locale = 'en', user, signOutSlot }) {
       {open && (
         <div
           className="admin-drawer-overlay"
-          onClick={() => setOpen(false)}
+          onClick={closeDrawer}
           aria-hidden="true"
         />
       )}
 
-      <aside className={`admin-sidebar${open ? ' open' : ''}`}>
+      <aside
+        ref={asideRef}
+        className={`admin-sidebar${open ? ' open' : ''}`}
+        role={open ? 'dialog' : undefined}
+        aria-modal={open ? 'true' : undefined}
+        aria-label={open ? t('openMenu') : undefined}
+      >
         <div className="admin-sidebar-head">
           <div className="admin-logo">
             Pro<span>Ex</span>
           </div>
           <button
+            ref={closeRef}
             type="button"
             className="admin-drawer-close"
             aria-label={t('closeMenu')}
-            onClick={() => setOpen(false)}
+            onClick={closeDrawer}
           >
             <span aria-hidden="true">×</span>
           </button>

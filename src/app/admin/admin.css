@@ -54,7 +54,7 @@
   --a-border: rgba(255, 255, 255, 0.08);
   --a-border-strong: rgba(255, 255, 255, 0.14);
   --a-text: #e8edf2;
-  --a-muted: #6b7a8d;
+  --a-muted: #7c8a9c; /* ≥4.5:1 (WCAG AA) on --a-bg and --a-bg2 */
   --a-dim: #9ba8b5;
   --a-red: #e05b5b;
   --a-green: #52c87a;
@@ -127,6 +127,15 @@
 [dir='rtl'] .icon--dir {
   transform: scaleX(-1);
 }
+/* Arabic is cursive/connected — positive letter-spacing pushes joined
+   letterforms apart. Neutralise it on the tracked-uppercase labels in RTL. */
+[dir='rtl'] .dash-eyebrow,
+[dir='rtl'] .admin-nav-group,
+[dir='rtl'] .table th,
+[dir='rtl'] .detail-label,
+[dir='rtl'] .form-section-title {
+  letter-spacing: 0;
+}
 
 .admin-shell {
   display: flex;
@@ -170,10 +179,14 @@
 .admin-nav {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+}
+.admin-nav-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
 }
 .admin-nav-cluster + .admin-nav-cluster {
   margin-block-start: var(--sp-6);
@@ -452,7 +465,7 @@
   font-size: 14px;
 }
 .table th {
-  text-align: left;
+  text-align: start;
   padding: 13px 18px;
   font-size: 12px;
   text-transform: uppercase;
@@ -850,7 +863,10 @@ a.card:hover {
     z-index: 80;
     height: 100dvh;
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
+    /* visibility:hidden keeps the closed drawer out of the tab order + a11y
+       tree; transitioning it preserves the slide animation. */
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
     box-shadow: 2px 0 24px rgba(0, 0, 0, 0.4);
     width: 288px;
   }
@@ -861,6 +877,7 @@ a.card:hover {
   .admin-sidebar.open,
   [dir='rtl'] .admin-sidebar.open {
     transform: translateX(0);
+    visibility: visible;
   }
   .admin-drawer-overlay {
     position: fixed;
@@ -1036,7 +1053,7 @@ a.card:hover {
   flex: 0 0 40px;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--a-radius-sm);
   display: grid;
   place-items: center;
   background: var(--a-bg3);

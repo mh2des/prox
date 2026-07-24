@@ -275,14 +275,14 @@ export default async function AdminDashboard() {
                 role="img"
                 aria-label={`${t('dash.translationHealth')} ${pct}%`}
               >
-                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--a-bg4)" strokeWidth="3.2" />
+                <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--a-bg3)" strokeWidth="4" />
                 <circle
                   cx="21"
                   cy="21"
                   r="15.9155"
                   fill="none"
                   stroke={ringColor}
-                  strokeWidth="3.2"
+                  strokeWidth="4"
                   strokeLinecap="round"
                   strokeDasharray={`${pct} ${100 - pct}`}
                   strokeDashoffset="25"
@@ -327,26 +327,30 @@ export default async function AdminDashboard() {
                 aria-label={`${postsPublished} ${t('dash.published')}, ${postsDraft} ${t('dash.draft')}`}
               >
                 <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--a-bg3)" strokeWidth="4" />
-                <circle
-                  cx="21"
-                  cy="21"
-                  r="15.9155"
-                  fill="none"
-                  stroke="var(--a-green)"
-                  strokeWidth="4"
-                  strokeDasharray={`${p1} ${100 - p1}`}
-                  strokeDashoffset="25"
-                />
-                <circle
-                  cx="21"
-                  cy="21"
-                  r="15.9155"
-                  fill="none"
-                  stroke="var(--a-yellow)"
-                  strokeWidth="4"
-                  strokeDasharray={`${100 - p1} ${p1}`}
-                  strokeDashoffset={100 - p1 + 25}
-                />
+                {postsTotal > 0 && (
+                  <>
+                    <circle
+                      cx="21"
+                      cy="21"
+                      r="15.9155"
+                      fill="none"
+                      stroke="var(--a-green)"
+                      strokeWidth="4"
+                      strokeDasharray={`${p1} ${100 - p1}`}
+                      strokeDashoffset="25"
+                    />
+                    <circle
+                      cx="21"
+                      cy="21"
+                      r="15.9155"
+                      fill="none"
+                      stroke="var(--a-yellow)"
+                      strokeWidth="4"
+                      strokeDasharray={`${100 - p1} ${p1}`}
+                      strokeDashoffset={100 - p1 + 25}
+                    />
+                  </>
+                )}
                 <text x="21" y="19" textAnchor="middle" fill="var(--a-text)" fontSize="8" fontWeight="700">
                   {fmtNum(postsTotal, locale)}
                 </text>
