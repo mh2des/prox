@@ -49,7 +49,7 @@
 /* All nav links */
 .navList a,
 .langBtn {
-  font-size: 0.78rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: #1d2b4f;           /* dark navy — matches image */
   letter-spacing: 0.07em;
@@ -93,7 +93,7 @@
 }
 
 .dropdownTrigger span {
-  font-size: 0.78rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: #1d2b4f;
   letter-spacing: 0.07em;

@@ -84,20 +84,28 @@ body {
   scroll-behavior: smooth;
 }
 
+/* Bump the root so every rem-based size (fonts AND spacing) grows together —
+   a bigger, airier feel that suits the Thmanyah serif. */
+html {
+  font-size: 18px;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   /* Thmanyah Text body face (Arabic + Latin), medium weight + airy line-height.
      font-feature-settings is the key to Thmanyah's beauty (matches irab.app):
      contextual alternates, kerning, ligatures, and — crucially — stylistic
-     alternates (salt) for the refined letterforms. */
+     alternates (salt) for the refined letterforms. Extra line/word spacing
+     gives the serif room to breathe (it reads packed when tight). */
   font-family: var(--font-primary);
   font-weight: 500;
   font-synthesis: none;
   font-feature-settings: 'calt', 'kern', 'liga', 'salt';
+  word-spacing: 0.06em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.7;
+  line-height: 1.85;
 }
 
 /* Headings: display face, and route family via zero-specificity :where so page
@@ -112,7 +120,8 @@ body {
    that were tuned for the old sans (900/800), which read clunky in the serif. */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  line-height: 1.3 !important;
 }
 
 * {
