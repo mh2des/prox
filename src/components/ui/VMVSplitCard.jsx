@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import styles from "./VMVSplitCard.module.css";
 
-export default function VMVSplitCard({ vision, mission, isAr }) {
+export default function VMVSplitCard({ vision, mission, stats, isAr }) {
   const visionTitle =
     vision?.title || "Shaping Institutional Excellence Across the Region";
   const missionTitle =
@@ -12,6 +12,13 @@ export default function VMVSplitCard({ vision, mission, isAr }) {
   const missionText =
     mission?.text ||
     "To partner with visionary leaders and institutions, offering integrated advisory solutions that strengthen governance, enhance performance, and foster resilient and future-ready organizations.";
+
+  const fallbackStats = [
+    { value: "50+", label: isAr ? "مؤسسة خدمناها" : "Institutions Served" },
+    { value: "12+", label: isAr ? "سنوات من الأثر" : "Years of Impact" },
+    { value: "3", label: isAr ? "قطاعات" : "Sectors" },
+  ];
+  const displayStats = (stats?.length ? stats : fallbackStats).slice(0, 3);
 
   return (
     <div className={styles.card}>
@@ -51,20 +58,15 @@ export default function VMVSplitCard({ vision, mission, isAr }) {
         </p>
 
         <div className={styles.missionStats}>
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>50+</span>
-            <span className={styles.statLabel}>{isAr ? 'مؤسسة خدمناها' : 'Institutions Served'}</span>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>12+</span>
-            <span className={styles.statLabel}>{isAr ? 'سنوات من الأثر' : 'Years of Impact'}</span>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>3</span>
-            <span className={styles.statLabel}>{isAr ? 'قطاعات' : 'Sectors'}</span>
-          </div>
+          {displayStats.map((stat, i) => (
+            <div key={i} style={{ display: 'contents' }}>
+              {i > 0 && <div className={styles.statDivider} />}
+              <div className={styles.statItem}>
+                <span className={styles.statNum}>{stat.value}</span>
+                <span className={styles.statLabel}>{stat.label}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

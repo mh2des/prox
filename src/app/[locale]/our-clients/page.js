@@ -32,9 +32,9 @@ export default async function OurClients({ params: { locale } }) {
         <div className="container">
           <ScrollReveal animation="scaleUp">
             <div className={styles.clientsGrid}>
-              {clients.map((client) => (
-                <div key={client.id} className={styles.clientCard}>
-                  <div className={styles.clientLogo}>
+              {clients.map((client) => {
+                const inner = (
+                  <div className={styles.clientLogo} title={client.desc || undefined}>
                     {client.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -46,8 +46,19 @@ export default async function OurClients({ params: { locale } }) {
                       <span className={styles.clientName}>{client.name}</span>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+                return (
+                  <div key={client.id} className={styles.clientCard}>
+                    {client.website ? (
+                      <a href={client.website} target="_blank" rel="noopener noreferrer">
+                        {inner}
+                      </a>
+                    ) : (
+                      inner
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </ScrollReveal>
         </div>

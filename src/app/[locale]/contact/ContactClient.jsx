@@ -15,10 +15,21 @@ function SubmitButton({ label }) {
   );
 }
 
-export default function ContactClient({ locale, offices, labels }) {
+export default function ContactClient({ locale, offices, labels, page }) {
   const isAr = locale === 'ar';
   const c = labels || {};
+  const p = page || {};
   const [state, formAction] = useFormState(submitContact, {});
+
+  // DB-driven map background (hero) with the CSS default kept as fallback.
+  const mapImageStyle = p.heroImageUrl
+    ? { backgroundImage: `url('${p.heroImageUrl}')` }
+    : undefined;
+
+  // Form heading area: prefer the admin-editable Page hero copy, fall back to
+  // the current localized messages label.
+  const formHeading = p.heroTitle || c.formTitle;
+  const formSubheading = p.heroSubtitle || null;
 
   const sectionRef = useRef(null);
   const imageRef = useRef(null);
@@ -56,7 +67,7 @@ export default function ContactClient({ locale, offices, labels }) {
         onMouseLeave={handleMouseLeave}
       >
         <a href={mapLink || '#'} target="_blank" rel="noopener noreferrer" className={styles.mapLinkArea}>
-          <div className={styles.mapImage} ref={imageRef} />
+          <div className={styles.mapImage} ref={imageRef} style={mapImageStyle} />
           <div className={styles.mapOverlay} />
           <div ref={spotRef} className={styles.mapSpotlight} />
           <div className={styles.mapBg}>
@@ -82,6 +93,20 @@ export default function ContactClient({ locale, offices, labels }) {
                 {office.lines.map((line, j) => (
                   <p key={j} className={styles.officeLineText}>{line}</p>
                 ))}
+                {office.phone && (
+                  <p className={styles.officeLineText}>
+                    <a href={`tel:${office.phone.replace(/\s+/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {office.phone}
+                    </a>
+                  </p>
+                )}
+                {office.email && (
+                  <p className={styles.officeLineText}>
+                    <a href={`mailto:${office.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {office.email}
+                    </a>
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -91,7 +116,12 @@ export default function ContactClient({ locale, offices, labels }) {
       {/* Contact Form */}
       <div className={styles.formSection}>
         <div className="container">
-          <h2 className={styles.formTitle}>{c.formTitle}</h2>
+          <h2 className={styles.formTitle}>{formHeading}</h2>
+          {formSubheading && (
+            <p style={{ color: 'rgba(255,255,255,0.78)', fontSize: '1.05rem', lineHeight: 1.6, marginTop: '-1.5rem', marginBottom: '2.5rem', maxWidth: '46rem' }}>
+              {formSubheading}
+            </p>
+          )}
 
           {state?.ok ? (
             <p style={{ color: '#52c87a', fontWeight: 600, marginTop: '1rem' }}>

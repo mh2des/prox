@@ -2,11 +2,13 @@
 
 import React, { useState, useRef } from 'react';
 import styles from './InteractiveTeam.module.css';
+import TeamDetailModal from './TeamDetailModal';
 
 export default function InteractiveTeam({ leaders, isAr }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [profileOpen, setProfileOpen] = useState(false);
   const trackRef = useRef(null);
-  
+
   const activeLeader = leaders[activeIndex];
   
   const handleNext = () => {
@@ -46,15 +48,59 @@ export default function InteractiveTeam({ leaders, isAr }) {
           <h4 className={styles.leaderTitle}>{activeLeader.title}</h4>
           
           <p className={styles.leaderBio}>{activeLeader.bio}</p>
-          
-          {/* LinkedIn Button placeholder */}
-          <a href="#" className={styles.linkedinBtn} aria-label="LinkedIn Profile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-              <rect x="2" y="9" width="4" height="12"/>
-              <circle cx="4" cy="4" r="2"/>
-            </svg>
-          </a>
+
+          {/* Actions: LinkedIn + View full profile */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              flexDirection: isAr ? 'row-reverse' : 'row',
+              justifyContent: isAr ? 'flex-end' : 'flex-start',
+            }}
+          >
+            {activeLeader.linkedin ? (
+              <a
+                href={activeLeader.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.linkedinBtn}
+                aria-label="LinkedIn Profile"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                  <rect x="2" y="9" width="4" height="12"/>
+                  <circle cx="4" cy="4" r="2"/>
+                </svg>
+              </a>
+            ) : null}
+
+            {((activeLeader.expertise && activeLeader.expertise.length > 0) ||
+              (activeLeader.experience && activeLeader.experience.length > 0) ||
+              activeLeader.subtitle) ? (
+              <button
+                type="button"
+                onClick={() => setProfileOpen(true)}
+                aria-label={isAr ? 'عرض الملف الكامل' : 'View full profile'}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                  color: '#fff',
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '4px',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}
+              >
+                {isAr ? 'عرض الملف الكامل' : 'View full profile'}
+              </button>
+            ) : null}
+          </div>
         </div>
         
         <div className={styles.rightCol}>
@@ -105,14 +151,23 @@ export default function InteractiveTeam({ leaders, isAr }) {
           })}
         </div>
         
-        <button 
-          className={styles.arrow} 
+        <button
+          className={styles.arrow}
           onClick={handleNext}
           aria-label="Next member"
         >
           &#10095;
         </button>
       </div>
+
+      {/* Full profile modal (expertise / experience / subtitle) */}
+      {profileOpen ? (
+        <TeamDetailModal
+          member={activeLeader}
+          isAr={isAr}
+          onClose={() => setProfileOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

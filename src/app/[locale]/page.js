@@ -33,7 +33,7 @@ export default async function Home({ params: { locale } }) {
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
-          <div className={styles.heroLabel}>{isAr ? 'بروإكس الاستشارية' : 'ProEx Advisory'}</div>
+          <div className={styles.heroLabel}>{page?.heroBadge || (isAr ? 'بروإكس الاستشارية' : 'ProEx Advisory')}</div>
           <h1 className={styles.heroTitle}>
             {(() => {
               // Prefer the DB hero title (which holds both lines); render the
@@ -85,9 +85,17 @@ export default async function Home({ params: { locale } }) {
             {/* Right — slides up with slight delay */}
             <ScrollReveal animation="fadeUp">
               <div className={styles.whoRight}>
-                <p className={styles.whoPara}>{h.whoText1}</p>
-                <p className={styles.whoPara}>{h.whoText2}</p>
-                <p className={styles.whoPara}>{h.whoText3}</p>
+                {page?.introParagraphs?.length ? (
+                  page.introParagraphs.map((para, i) => (
+                    <p key={i} className={styles.whoPara}>{para}</p>
+                  ))
+                ) : (
+                  <>
+                    <p className={styles.whoPara}>{h.whoText1}</p>
+                    <p className={styles.whoPara}>{h.whoText2}</p>
+                    <p className={styles.whoPara}>{h.whoText3}</p>
+                  </>
+                )}
                 <Link href={`/${locale}/who-we-are`} className={styles.btnPrimary}>{h.whoBtn}</Link>
               </div>
             </ScrollReveal>

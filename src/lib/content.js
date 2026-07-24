@@ -16,6 +16,17 @@ function paragraphs(text) {
   return (text || '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 }
 
+// ── Site settings (singleton) ──
+export async function getSettings(locale) {
+  const row = await prisma.setting.findUnique({ where: { id: 1 } });
+  if (!row) return null;
+  return {
+    companyName: row.companyName,
+    companyDesc: pick(row, 'companyDesc', locale),
+    adminEmail: row.adminEmail,
+  };
+}
+
 // ── Page hero / intro ──
 export async function getPage(slug, locale) {
   const p = await prisma.page.findUnique({ where: { slug } });

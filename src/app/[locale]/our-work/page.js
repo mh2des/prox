@@ -36,6 +36,9 @@ export default async function OurWork({ params: { locale } }) {
                     { label: isAr ? 'العميل' : 'Client', value: project.client },
                     { label: isAr ? 'القطاع' : 'Sector', value: project.sector },
                     { label: isAr ? 'السنة' : 'Year', value: project.year },
+                    ...(project.location
+                      ? [{ label: isAr ? 'الموقع' : 'Location', value: project.location }]
+                      : []),
                   ].map((item, i) => (
                     <div key={i} className={styles.metaItem}>
                       <span className={styles.metaLabel}>{item.label}</span>

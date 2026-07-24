@@ -11,7 +11,7 @@ const CheckIcon = () => (
   </svg>
 );
 
-export default function TeamDetailModal({ member, onClose }) {
+export default function TeamDetailModal({ member, onClose, isAr = false }) {
   // Prevent body scrolling when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -22,17 +22,21 @@ export default function TeamDetailModal({ member, onClose }) {
 
   if (!member) return null;
 
+  const expertise = Array.isArray(member.expertise) ? member.expertise : [];
+  const experience = Array.isArray(member.experience) ? member.experience : [];
+
   return (
     <AnimatePresence>
-      <motion.div 
+      <motion.div
         className={styles.modalOverlay}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
-        <motion.div 
+        <motion.div
           className={styles.modalContent}
+          dir={isAr ? 'rtl' : 'ltr'}
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -50,41 +54,51 @@ export default function TeamDetailModal({ member, onClose }) {
             <div className={styles.modalMeta}>
               <h2 className={styles.modalName}>{member.name}</h2>
               <p className={styles.modalRole}>{member.title}</p>
-              <p className={styles.modalSubtitle}>{member.subtitle}</p>
+              {member.subtitle ? (
+                <p className={styles.modalSubtitle}>{member.subtitle}</p>
+              ) : null}
             </div>
           </div>
 
           <div className={styles.modalBody}>
-            <p className={styles.modalBio}>{member.bio}</p>
+            {member.bio ? <p className={styles.modalBio}>{member.bio}</p> : null}
 
             <div className={styles.modalGrid}>
-              
-              <div className={styles.modalCol}>
-                <h4 className={styles.modalColTitle}>Key Expertise</h4>
-                <ul className={styles.expertiseList}>
-                  {member.expertise.map((e, j) => (
-                    <li key={j} className={styles.expertiseItem}>
-                      <CheckIcon />
-                      <span>{e}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
-              <div className={styles.modalCol}>
-                <h4 className={styles.modalColTitle}>Selected Experience</h4>
-                <div className={styles.expList}>
-                  {member.experience.map((ex, j) => (
-                    <div key={j} className={styles.expItem}>
-                      <div className={styles.expDot} />
-                      <div>
-                        <p className={styles.expRole}>{ex.role}</p>
-                        <p className={styles.expDesc}>{ex.desc}</p>
-                      </div>
-                    </div>
-                  ))}
+              {expertise.length > 0 ? (
+                <div className={styles.modalCol}>
+                  <h4 className={styles.modalColTitle}>
+                    {isAr ? 'الخبرات الرئيسية' : 'Key Expertise'}
+                  </h4>
+                  <ul className={styles.expertiseList}>
+                    {expertise.map((e, j) => (
+                      <li key={j} className={styles.expertiseItem}>
+                        <CheckIcon />
+                        <span>{e}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              ) : null}
+
+              {experience.length > 0 ? (
+                <div className={styles.modalCol}>
+                  <h4 className={styles.modalColTitle}>
+                    {isAr ? 'خبرات مختارة' : 'Selected Experience'}
+                  </h4>
+                  <div className={styles.expList}>
+                    {experience.map((ex, j) => (
+                      <div key={j} className={styles.expItem}>
+                        <div className={styles.expDot} />
+                        <div>
+                          <p className={styles.expRole}>{ex.role}</p>
+                          <p className={styles.expDesc}>{ex.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
             </div>
           </div>

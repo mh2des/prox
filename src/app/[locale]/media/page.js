@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import styles from './page.module.css';
 import { getTranslations } from '../../../lib/i18n';
-import { getPublishedPosts } from '../../../lib/content';
+import { getPublishedPosts, getPage } from '../../../lib/content';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +39,9 @@ export default async function Media({ params: { locale } }) {
   const t = getTranslations(locale);
   const m = t.media;
   const readMore = locale === 'ar' ? 'اقرأ المزيد' : 'Read More';
+
+  // ── DB: editable page hero (falls back to messages/inline strings) ──
+  const page = await getPage('media', locale);
 
   // ── DB: published media posts ──
   const posts = await getPublishedPosts(locale);
@@ -84,14 +87,17 @@ export default async function Media({ params: { locale } }) {
     <div className={styles.page}>
 
       {/* ── 1. HERO ─────────────────────────────────────────── */}
-      <section className={styles.hero}>
+      <section
+        className={styles.hero}
+        style={page?.heroImageUrl ? { backgroundImage: `url(${page.heroImageUrl})` } : undefined}
+      >
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroChip}>
-            {locale === 'ar' ? 'الإعلام والمعرفة' : 'Media & Knowledge'}
+            {page?.heroBadge || (locale === 'ar' ? 'الإعلام والمعرفة' : 'Media & Knowledge')}
           </div>
-          <h1 className={styles.heroTitle}>{m.heroTitle}</h1>
-          <p className={styles.heroSubtitle}>{m.heroSubtitle}</p>
+          <h1 className={styles.heroTitle}>{page?.heroTitle || m.heroTitle}</h1>
+          <p className={styles.heroSubtitle}>{page?.heroSubtitle || m.heroSubtitle}</p>
         </div>
         <div className={styles.heroBar} />
       </section>

@@ -3,7 +3,7 @@ import styles from '../about/page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import VMVSplitCard from '../../../components/ui/VMVSplitCard';
 import ValuesInfographic from '../../../components/ui/ValuesInfographic';
-import { getPage, getPrinciples } from '../../../lib/content';
+import { getPage, getPrinciples, getStats } from '../../../lib/content';
 import en from '../../../../messages/en.json';
 import ar from '../../../../messages/ar.json';
 
@@ -14,9 +14,10 @@ export default async function WhoWeAre({ params: { locale } }) {
   const w = t.ourWork.who;
   const isAr = locale === 'ar';
 
-  const [page, principles] = await Promise.all([
+  const [page, principles, stats] = await Promise.all([
     getPage('who-we-are', locale),
     getPrinciples(locale),
+    getStats(locale),
   ]);
 
   const heroTitle =
@@ -86,7 +87,7 @@ export default async function WhoWeAre({ params: { locale } }) {
           </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" threshold={0.12}>
-            <VMVSplitCard vision={principles.vision} mission={principles.mission} isAr={isAr} />
+            <VMVSplitCard vision={principles.vision} mission={principles.mission} stats={stats} isAr={isAr} />
           </ScrollReveal>
         </div>
       </section>
