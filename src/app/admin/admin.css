@@ -40,6 +40,9 @@
 }
 
 :root {
+  /* Tell the browser this is a dark UI so native controls (date/number/select
+     pickers, scrollbars, autofill) render dark instead of light-on-dark. */
+  color-scheme: dark;
   --a-primary: #298a8b;
   --a-primary-light: #3aacad;
   --a-primary-dark: #1d6566;
@@ -110,9 +113,13 @@
   background: var(--a-bg3);
   color: var(--a-text);
 }
+.admin-nav-item {
+  white-space: nowrap;
+}
 .admin-nav-item.active {
   background: var(--a-primary-ghost);
   color: var(--a-primary-light);
+  box-shadow: inset 3px 0 0 var(--a-primary-light);
 }
 .admin-nav-item.soon {
   opacity: 0.4;
@@ -250,10 +257,12 @@
   background: var(--a-bg2);
   border: 1px solid var(--a-border);
   border-radius: var(--a-radius);
-  overflow: hidden;
+  /* Scroll wide tables inside the card instead of clipping the action column. */
+  overflow-x: auto;
 }
 .table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: 14px;
 }
@@ -301,6 +310,18 @@
   background: rgba(155, 168, 181, 0.14);
   color: var(--a-dim);
 }
+.badge-yellow {
+  background: rgba(240, 165, 0, 0.14);
+  color: var(--a-yellow);
+}
+.badge-red {
+  background: rgba(224, 91, 91, 0.14);
+  color: var(--a-red);
+}
+.badge-primary {
+  background: var(--a-primary-ghost);
+  color: var(--a-primary-light);
+}
 
 /* ── Forms ── */
 .form {
@@ -346,6 +367,7 @@
 .textarea:focus,
 .select:focus {
   border-color: var(--a-primary);
+  box-shadow: 0 0 0 3px var(--a-primary-ghost);
 }
 .textarea {
   min-height: 96px;
@@ -356,6 +378,13 @@
   align-items: center;
   gap: 10px;
 }
+/* Theme the native checkboxes to the teal palette. */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--a-primary);
+  width: 16px;
+  height: 16px;
+}
 .form-actions {
   display: flex;
   gap: 12px;
@@ -365,10 +394,78 @@
   color: var(--a-red);
   font-size: 13px;
 }
+.form-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--a-radius-sm);
+  background: rgba(82, 200, 122, 0.12);
+  color: var(--a-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Grouped form sections (titled cards) for long forms. */
+.form-section {
+  background: var(--a-bg2);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.form-section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--a-muted);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Read-only detail views (definition-list style) for inbox items. */
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--a-border);
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--a-muted);
+}
+.detail-value {
+  color: var(--a-text);
+}
+
+/* Consistent, visible keyboard focus. */
+:focus-visible {
+  outline: 2px solid var(--a-primary-light);
+  outline-offset: 2px;
+}
+.btn:focus-visible,
+.admin-nav-item:focus-visible,
+.rte-btn:focus-visible {
+  outline: 2px solid var(--a-primary-light);
+  outline-offset: 2px;
+}
+
 .empty {
   padding: 48px;
   text-align: center;
   color: var(--a-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 /* ── Rich text editor ── */
@@ -433,13 +530,23 @@
 .rte-content ul,
 .rte-content ol {
   margin: 0 0 10px;
-  padding-left: 22px;
+  /* Logical property so bullets sit on the correct side in RTL (Arabic). */
+  padding-inline-start: 22px;
 }
 .rte-content blockquote {
-  border-left: 3px solid var(--a-primary);
-  padding-left: 12px;
+  border-inline-start: 3px solid var(--a-primary);
+  padding-inline-start: 12px;
   color: var(--a-dim);
   margin: 0 0 10px;
+}
+
+/* Clickable dashboard stat cards. */
+a.card {
+  transition: border-color 0.15s, background 0.15s;
+}
+a.card:hover {
+  border-color: var(--a-border-strong);
+  background: var(--a-bg3);
 }
 
 /* ── Upload field ── */

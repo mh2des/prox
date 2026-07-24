@@ -5,15 +5,16 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { isSafeUrl } from '@/lib/sanitize';
 
 const officeSchema = z.object({
   cityEn: z.string().min(1, 'English city is required'),
   cityAr: z.string().optional(),
   addressEn: z.string().min(1, 'English address is required'),
   addressAr: z.string().optional(),
-  mapsUrl: z.string().optional(),
+  mapsUrl: z.string().optional().refine(isSafeUrl, 'MapsUrl must be a valid URL'),
   phone: z.string().optional(),
-  email: z.string().optional(),
+  email: z.string().email('Enter a valid email').optional().or(z.literal('')),
   sortOrder: z.number().int(),
 });
 

@@ -5,13 +5,14 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { isSafeUrl } from '@/lib/sanitize';
 
 const clientSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   descEn: z.string().optional(),
   descAr: z.string().optional(),
-  website: z.string().optional(),
-  logoUrl: z.string().optional(),
+  website: z.string().optional().refine(isSafeUrl, 'Website must be a valid URL'),
+  logoUrl: z.string().optional().refine(isSafeUrl, 'LogoUrl must be a valid URL'),
   published: z.boolean(),
   sortOrder: z.number().int(),
 });

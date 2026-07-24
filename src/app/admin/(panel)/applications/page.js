@@ -56,7 +56,7 @@ export default async function ApplicationsList() {
                         View
                       </Link>
                       {a.cvUrl && (
-                        <a href={a.cvUrl} target="_blank" rel="noopener" className="btn btn-ghost btn-sm">
+                        <a href={a.cvUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
                           CV
                         </a>
                       )}

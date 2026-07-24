@@ -87,8 +87,19 @@ export async function createJob(prevState, formData) {
   const parsed = jobSchema.safeParse(extract(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn));
-  await prisma.job.create({ data: toData(parsed.data, slug) });
+  let slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn));
+  try {
+    await prisma.job.create({ data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code !== 'P2002') throw e;
+    // Slug was taken by a concurrent write between our check and this insert.
+    try {
+      slug = await uniqueSlug(`${slug}-2`);
+      await prisma.job.create({ data: toData(parsed.data, slug) });
+    } catch (e2) {
+      return { error: 'A job with this slug already exists.' };
+    }
+  }
 
   revalidatePath('/admin/jobs');
   redirect('/admin/jobs');
@@ -99,8 +110,19 @@ export async function updateJob(id, prevState, formData) {
   const parsed = jobSchema.safeParse(extract(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn), id);
-  await prisma.job.update({ where: { id }, data: toData(parsed.data, slug) });
+  let slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn), id);
+  try {
+    await prisma.job.update({ where: { id }, data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code !== 'P2002') throw e;
+    // Slug was taken by a concurrent write between our check and this update.
+    try {
+      slug = await uniqueSlug(`${slug}-2`, id);
+      await prisma.job.update({ where: { id }, data: toData(parsed.data, slug) });
+    } catch (e2) {
+      return { error: 'A job with this slug already exists.' };
+    }
+  }
 
   revalidatePath('/admin/jobs');
   redirect('/admin/jobs');

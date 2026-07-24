@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { isSafeUrl } from '@/lib/sanitize';
 
 const teamMemberSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -17,7 +18,7 @@ const teamMemberSchema = z.object({
   experienceEn: z.array(z.string()),
   experienceAr: z.array(z.string()),
   photoUrl: z.string().optional(),
-  linkedin: z.string().optional(),
+  linkedin: z.string().optional().refine(isSafeUrl, 'Linkedin must be a valid URL'),
   published: z.boolean(),
   sortOrder: z.number().int(),
 });

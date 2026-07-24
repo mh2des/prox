@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { isSafeUrl } from '@/lib/sanitize';
 
 const pageSchema = z.object({
   heroBadgeEn: z.string().optional(),
@@ -15,7 +16,7 @@ const pageSchema = z.object({
   heroSubtitleAr: z.string().optional(),
   introEn: z.string().optional(),
   introAr: z.string().optional(),
-  heroImageUrl: z.string().optional(),
+  heroImageUrl: z.string().optional().refine(isSafeUrl, 'Hero image must be a valid URL'),
 });
 
 async function requireAuth() {
@@ -57,7 +58,12 @@ export async function updatePage(slug, prevState, formData) {
   const parsed = pageSchema.safeParse(extract(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  await prisma.page.update({ where: { slug }, data: toData(parsed.data) });
+  const data = toData(parsed.data);
+  await prisma.page.upsert({
+    where: { slug },
+    update: { ...data },
+    create: { slug, ...data },
+  });
 
   revalidatePath('/admin/pages');
   redirect('/admin/pages');

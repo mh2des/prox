@@ -9,7 +9,15 @@ const schema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   message: z.string().optional(),
-  cvUrl: z.string().optional(),
+  // Must be a real UploadThing file URL — never trust an arbitrary URL from a
+  // public form (it is later rendered as an <a href> in the admin).
+  cvUrl: z
+    .string()
+    .optional()
+    .refine(
+      (v) => !v || (/^https:\/\//i.test(v) && /(ufs\.sh|utfs\.io)/i.test(v)),
+      'Invalid CV upload'
+    ),
 });
 
 // Public careers form → creates an Application row in the admin inbox.

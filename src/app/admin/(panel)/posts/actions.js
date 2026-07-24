@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { sanitizeRichText, isSafeUrl } from '@/lib/sanitize';
 
 const postSchema = z.object({
   titleEn: z.string().min(1, 'English title is required'),
@@ -15,7 +16,7 @@ const postSchema = z.object({
   contentAr: z.string().optional(),
   author: z.string().optional(),
   status: z.enum(['PUBLISHED', 'DRAFT']),
-  featuredImage: z.string().optional(),
+  featuredImage: z.string().optional().refine(isSafeUrl, 'Featured image must be an http(s) URL or a local path'),
   publishedAt: z.string().optional(),
   slug: z.string().optional(),
 });
@@ -73,8 +74,8 @@ function toData(d, slug) {
     titleAr: d.titleAr || null,
     excerptEn: d.excerptEn || null,
     excerptAr: d.excerptAr || null,
-    contentEn: d.contentEn || null,
-    contentAr: d.contentAr || null,
+    contentEn: d.contentEn ? sanitizeRichText(d.contentEn) : null,
+    contentAr: d.contentAr ? sanitizeRichText(d.contentAr) : null,
     author: d.author || null,
     status: d.status,
     featuredImage: d.featuredImage || null,
@@ -88,7 +89,14 @@ export async function createPost(prevState, formData) {
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn));
-  await prisma.post.create({ data: toData(parsed.data, slug) });
+  try {
+    await prisma.post.create({ data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code === 'P2002') {
+      return { error: 'That slug is already in use. Please try again.' };
+    }
+    throw e;
+  }
 
   revalidatePath('/admin/posts');
   redirect('/admin/posts');
@@ -100,7 +108,14 @@ export async function updatePost(id, prevState, formData) {
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn), id);
-  await prisma.post.update({ where: { id }, data: toData(parsed.data, slug) });
+  try {
+    await prisma.post.update({ where: { id }, data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code === 'P2002') {
+      return { error: 'That slug is already in use. Please try again.' };
+    }
+    throw e;
+  }
 
   revalidatePath('/admin/posts');
   redirect('/admin/posts');

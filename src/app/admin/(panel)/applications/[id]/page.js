@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import DeleteButton from '@/components/admin/DeleteButton';
 import { setApplicationStatus, deleteApplication } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -61,7 +62,7 @@ export default async function ApplicationDetail({ params }) {
             <div className="field">
               <span className="field-label">CV</span>
               <div>
-                <a href={a.cvUrl} target="_blank" rel="noopener" className="btn btn-ghost btn-sm">
+                <a href={a.cvUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
                   Open CV
                 </a>
               </div>
@@ -85,11 +86,7 @@ export default async function ApplicationDetail({ params }) {
                 {a.status === 'NEW' ? 'Mark reviewed' : 'Mark as new'}
               </button>
             </form>
-            <form action={deleteApplication.bind(null, a.id)}>
-              <button type="submit" className="btn btn-danger">
-                Delete
-              </button>
-            </form>
+            <DeleteButton action={deleteApplication.bind(null, a.id)} />
             <Link href="/admin/applications" className="btn btn-ghost">
               Back
             </Link>

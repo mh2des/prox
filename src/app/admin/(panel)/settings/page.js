@@ -4,11 +4,10 @@ import SettingsForm from './SettingsForm';
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const setting = await prisma.setting.upsert({
-    where: { id: 1 },
-    update: {},
-    create: { id: 1 },
-  });
+  let setting = await prisma.setting.findUnique({ where: { id: 1 } });
+  if (!setting) {
+    setting = await prisma.setting.create({ data: { id: 1 } });
+  }
 
   // Pass a plain, serialisable object to the client form.
   const data = {

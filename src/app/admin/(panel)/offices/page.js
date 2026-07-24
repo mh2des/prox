@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import DeleteButton from '@/components/admin/DeleteButton';
 import { deleteOffice } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -45,11 +46,7 @@ export default async function OfficesList() {
                       <Link href={`/admin/offices/${o.id}`} className="btn btn-ghost btn-sm">
                         Edit
                       </Link>
-                      <form action={deleteOffice.bind(null, o.id)}>
-                        <button type="submit" className="btn btn-danger btn-sm">
-                          Delete
-                        </button>
-                      </form>
+                      <DeleteButton action={deleteOffice.bind(null, o.id)} />
                     </div>
                   </td>
                 </tr>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import DeleteButton from '@/components/admin/DeleteButton';
 import { toggleMessageRead, deleteMessage } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -57,11 +58,7 @@ export default async function MessageDetail({ params }) {
               {message.read ? 'Mark as unread' : 'Mark as read'}
             </button>
           </form>
-          <form action={deleteMessage.bind(null, message.id)}>
-            <button type="submit" className="btn btn-danger">
-              Delete
-            </button>
-          </form>
+          <DeleteButton action={deleteMessage.bind(null, message.id)} />
         </div>
       </div>
     </>

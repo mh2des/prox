@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { isSafeUrl } from '@/lib/sanitize';
 
 const projectSchema = z.object({
   titleEn: z.string().min(1, 'English title is required'),
@@ -16,7 +17,7 @@ const projectSchema = z.object({
   year: z.string().optional(),
   location: z.string().optional(),
   projectDate: z.string().optional(),
-  imageUrl: z.string().optional(),
+  imageUrl: z.string().optional().refine(isSafeUrl, 'Image URL must be a valid URL'),
   slug: z.string().optional(),
   published: z.boolean(),
   sortOrder: z.number().int(),
@@ -93,8 +94,19 @@ export async function createProject(prevState, formData) {
   const parsed = projectSchema.safeParse(extract(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn));
-  await prisma.project.create({ data: toData(parsed.data, slug) });
+  let slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn));
+  try {
+    await prisma.project.create({ data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code !== 'P2002') throw e;
+    // Slug was taken by a concurrent write between our check and this insert.
+    try {
+      slug = await uniqueSlug(`${slug}-2`);
+      await prisma.project.create({ data: toData(parsed.data, slug) });
+    } catch (e2) {
+      return { error: 'A project with this slug already exists.' };
+    }
+  }
 
   revalidatePath('/admin/projects');
   redirect('/admin/projects');
@@ -105,8 +117,19 @@ export async function updateProject(id, prevState, formData) {
   const parsed = projectSchema.safeParse(extract(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn), id);
-  await prisma.project.update({ where: { id }, data: toData(parsed.data, slug) });
+  let slug = await uniqueSlug(slugify(parsed.data.slug || parsed.data.titleEn), id);
+  try {
+    await prisma.project.update({ where: { id }, data: toData(parsed.data, slug) });
+  } catch (e) {
+    if (e?.code !== 'P2002') throw e;
+    // Slug was taken by a concurrent write between our check and this update.
+    try {
+      slug = await uniqueSlug(`${slug}-2`, id);
+      await prisma.project.update({ where: { id }, data: toData(parsed.data, slug) });
+    } catch (e2) {
+      return { error: 'A project with this slug already exists.' };
+    }
+  }
 
   revalidatePath('/admin/projects');
   redirect('/admin/projects');
