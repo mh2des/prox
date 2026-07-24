@@ -1,42 +1,47 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { makeT } from '@/lib/admin-dict';
 
 // Success confirmations after a redirect-based save/delete. Server actions
-// redirect to `?flash=<key>`; this reads it, shows a banner, then strips the
-// param so a refresh doesn't re-show it. Rendered once in the panel layout.
+// redirect to `?flash=<key>`; this reads it, shows a banner for a few seconds,
+// then strips the param so a refresh doesn't re-show it. Rendered once in the
+// panel layout (which persists across in-panel navigations).
 export default function FlashBanner({ locale = 'en' }) {
   const t = makeT(locale);
   const params = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const key = params.get('flash');
-  const [visible, setVisible] = useState(false);
+  const key = params.get('flash'); // 'saved' | 'deleted' | null
+
+  // `shown` is the message currently on screen, independent of the URL param —
+  // so stripping the param (below) doesn't yank the banner away.
+  const [shown, setShown] = useState(null);
 
   useEffect(() => {
-    if (!key) {
-      setVisible(false);
-      return;
+    if (!key) return;
+    setShown(key);
+
+    // Remove ?flash from the address bar WITHOUT a Next navigation (which would
+    // re-render, clear this timeout, and hide the banner instantly). A plain
+    // history.replaceState keeps the router's cached searchParams intact, so
+    // this effect isn't re-triggered and the 4s timer survives.
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('flash');
+      window.history.replaceState(window.history.state, '', url.toString());
     }
-    setVisible(true);
-    const t = setTimeout(() => setVisible(false), 4000);
-    // Strip ?flash= from the URL without a navigation/scroll.
-    const rest = new URLSearchParams(params.toString());
-    rest.delete('flash');
-    const qs = rest.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    return () => clearTimeout(t);
+
+    const timer = setTimeout(() => setShown(null), 4000);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  if (!key && !visible) return null;
+  if (!shown) return null;
 
   return (
-    <div className={`admin-flash${visible ? ' show' : ''}`} role="status" aria-live="polite">
+    <div className="admin-flash show" role="status" aria-live="polite">
       <span aria-hidden="true">✓</span>
-      {key === 'deleted' ? t('flash.deleted') : t('flash.saved')}
+      {shown === 'deleted' ? t('flash.deleted') : t('flash.saved')}
     </div>
   );
 }
