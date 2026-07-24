@@ -15,8 +15,7 @@ export default function NotFound() {
       <body
         style={{
           margin: 0,
-          fontFamily:
-            "'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+          fontFamily: "'Thmanyah Text', system-ui, -apple-system, sans-serif",
           background: '#0F1317',
           color: '#E8EDF2',
         }}

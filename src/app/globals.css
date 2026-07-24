@@ -1,3 +1,42 @@
+/* ── Thmanyah Text (ثمانية للنصوص — the "للنصوص" text cut, font.thmanyah.com) ──
+   Self-hosted, five weights (Light/Regular/Medium/Bold/Black). This is the
+   site's primary face end-to-end; Latin falls back to system-ui. */
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-text-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-text-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-text-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-text-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-text-black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Brand Colors */
   --color-primary: #139088; /* Turquoise Green */
@@ -24,7 +63,7 @@
   --max-width: 1280px;
   
   /* Fonts */
-  --font-primary: 'Inter', sans-serif;
+  --font-primary: 'Thmanyah Text', system-ui, -apple-system, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,17 +86,11 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  /* Latin renders in Inter; Arabic glyphs fall through to IBM Plex Sans Arabic. */
-  font-family: var(--font-primary), var(--font-arabic), sans-serif;
+  /* Thmanyah Text end-to-end (Arabic + Latin), system-ui fallback. */
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-}
-
-/* Prefer the Arabic face first on RTL pages for better shaping/spacing. */
-[dir='rtl'] body,
-html[lang='ar'] body {
-  font-family: var(--font-arabic), var(--font-primary), sans-serif;
 }
 
 * {

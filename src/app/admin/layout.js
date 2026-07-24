@@ -14,8 +14,7 @@ const bodyStyle = {
   minHeight: '100vh',
   background: '#0F1317',
   color: '#E8EDF2',
-  fontFamily:
-    "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "'Thmanyah Text', system-ui, -apple-system, sans-serif",
   WebkitFontSmoothing: 'antialiased',
 };
 
