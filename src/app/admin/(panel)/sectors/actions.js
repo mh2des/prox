@@ -48,7 +48,7 @@ export async function createSector(prevState, formData) {
   await prisma.sector.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/sectors');
-  redirect('/admin/sectors');
+  redirect('/admin/sectors?flash=saved');
 }
 
 export async function updateSector(id, prevState, formData) {
@@ -59,7 +59,7 @@ export async function updateSector(id, prevState, formData) {
   await prisma.sector.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/sectors');
-  redirect('/admin/sectors');
+  redirect('/admin/sectors?flash=saved');
 }
 
 export async function deleteSector(id) {

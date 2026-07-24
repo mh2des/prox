@@ -109,7 +109,7 @@ export async function createProject(prevState, formData) {
   }
 
   revalidatePath('/admin/projects');
-  redirect('/admin/projects');
+  redirect('/admin/projects?flash=saved');
 }
 
 export async function updateProject(id, prevState, formData) {
@@ -132,7 +132,7 @@ export async function updateProject(id, prevState, formData) {
   }
 
   revalidatePath('/admin/projects');
-  redirect('/admin/projects');
+  redirect('/admin/projects?flash=saved');
 }
 
 export async function deleteProject(id) {

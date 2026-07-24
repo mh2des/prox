@@ -55,7 +55,7 @@ export async function createClient(prevState, formData) {
   await prisma.client.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/clients');
-  redirect('/admin/clients');
+  redirect('/admin/clients?flash=saved');
 }
 
 export async function updateClient(id, prevState, formData) {
@@ -66,7 +66,7 @@ export async function updateClient(id, prevState, formData) {
   await prisma.client.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/clients');
-  redirect('/admin/clients');
+  redirect('/admin/clients?flash=saved');
 }
 
 export async function deleteClient(id) {

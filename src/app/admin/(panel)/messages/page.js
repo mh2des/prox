@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
+import { formatDateTime } from '@/lib/format';
 import { deleteMessage } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +44,7 @@ export default async function MessagesList() {
                     <div className="field-hint">{m.email}</div>
                   </td>
                   <td>{m.subject || '(no subject)'}</td>
-                  <td>{m.createdAt.toLocaleString()}</td>
+                  <td>{formatDateTime(m.createdAt)}</td>
                   <td>
                     {m.read ? (
                       <span className="badge badge-muted">Read</span>

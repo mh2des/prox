@@ -30,5 +30,5 @@ export async function deleteApplication(id) {
   await requireAuth();
   await prisma.application.delete({ where: { id } });
   revalidatePath('/admin/applications');
-  redirect('/admin/applications');
+  redirect('/admin/applications?flash=saved');
 }

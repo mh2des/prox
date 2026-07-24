@@ -102,7 +102,7 @@ export async function createJob(prevState, formData) {
   }
 
   revalidatePath('/admin/jobs');
-  redirect('/admin/jobs');
+  redirect('/admin/jobs?flash=saved');
 }
 
 export async function updateJob(id, prevState, formData) {
@@ -125,7 +125,7 @@ export async function updateJob(id, prevState, formData) {
   }
 
   revalidatePath('/admin/jobs');
-  redirect('/admin/jobs');
+  redirect('/admin/jobs?flash=saved');
 }
 
 export async function deleteJob(id) {

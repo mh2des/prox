@@ -20,5 +20,5 @@ export async function deleteMessage(id) {
   await requireAuth();
   await prisma.message.delete({ where: { id } });
   revalidatePath('/admin/messages');
-  redirect('/admin/messages');
+  redirect('/admin/messages?flash=saved');
 }

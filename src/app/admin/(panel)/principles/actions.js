@@ -54,7 +54,7 @@ export async function createPrinciple(prevState, formData) {
   await prisma.principle.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/principles');
-  redirect('/admin/principles');
+  redirect('/admin/principles?flash=saved');
 }
 
 export async function updatePrinciple(id, prevState, formData) {
@@ -65,7 +65,7 @@ export async function updatePrinciple(id, prevState, formData) {
   await prisma.principle.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/principles');
-  redirect('/admin/principles');
+  redirect('/admin/principles?flash=saved');
 }
 
 export async function deletePrinciple(id) {

@@ -79,7 +79,7 @@ export async function createTeamMember(prevState, formData) {
   await prisma.teamMember.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/team');
-  redirect('/admin/team');
+  redirect('/admin/team?flash=saved');
 }
 
 export async function updateTeamMember(id, prevState, formData) {
@@ -90,7 +90,7 @@ export async function updateTeamMember(id, prevState, formData) {
   await prisma.teamMember.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/team');
-  redirect('/admin/team');
+  redirect('/admin/team?flash=saved');
 }
 
 export async function deleteTeamMember(id) {

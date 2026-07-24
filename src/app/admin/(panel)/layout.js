@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { auth, signOut } from '@/auth';
 import Sidebar from './Sidebar';
+import FlashBanner from '@/components/admin/FlashBanner';
 
 // Shell for all authenticated admin pages (everything except /admin/login).
 // Route group "(panel)" keeps the URLs clean (/admin, /admin/projects, …).
@@ -30,7 +32,12 @@ export default async function PanelLayout({ children }) {
             </form>
           </div>
         </div>
-        <div className="admin-content">{children}</div>
+        <div className="admin-content">
+          <Suspense fallback={null}>
+            <FlashBanner />
+          </Suspense>
+          {children}
+        </div>
       </div>
     </div>
   );

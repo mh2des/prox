@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { formatDate } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +43,7 @@ export default async function ApplicationsList() {
                     <div className="admin-page-sub" style={{ margin: 0 }}>{a.email}</div>
                   </td>
                   <td>{a.job?.titleEn || 'Unknown'}</td>
-                  <td>{new Date(a.createdAt).toLocaleDateString()}</td>
+                  <td>{formatDate(a.createdAt)}</td>
                   <td>
                     {a.status === 'NEW' ? (
                       <span className="badge badge-green">New</span>

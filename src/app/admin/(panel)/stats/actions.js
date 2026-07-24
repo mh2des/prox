@@ -48,7 +48,7 @@ export async function createStat(prevState, formData) {
   await prisma.stat.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/stats');
-  redirect('/admin/stats');
+  redirect('/admin/stats?flash=saved');
 }
 
 export async function updateStat(id, prevState, formData) {
@@ -59,7 +59,7 @@ export async function updateStat(id, prevState, formData) {
   await prisma.stat.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/stats');
-  redirect('/admin/stats');
+  redirect('/admin/stats?flash=saved');
 }
 
 export async function deleteStat(id) {

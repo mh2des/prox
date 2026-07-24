@@ -66,5 +66,5 @@ export async function updatePage(slug, prevState, formData) {
   });
 
   revalidatePath('/admin/pages');
-  redirect('/admin/pages');
+  redirect('/admin/pages?flash=saved');
 }

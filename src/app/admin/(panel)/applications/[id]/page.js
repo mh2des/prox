@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
+import { formatDateTime } from '@/lib/format';
 import { setApplicationStatus, deleteApplication } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -55,7 +56,7 @@ export default async function ApplicationDetail({ params }) {
 
           <div className="field">
             <span className="field-label">Applied</span>
-            <div>{new Date(a.createdAt).toLocaleString()}</div>
+            <div>{formatDateTime(a.createdAt)}</div>
           </div>
 
           {a.cvUrl && (

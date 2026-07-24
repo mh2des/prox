@@ -99,7 +99,7 @@ export async function createPost(prevState, formData) {
   }
 
   revalidatePath('/admin/posts');
-  redirect('/admin/posts');
+  redirect('/admin/posts?flash=saved');
 }
 
 export async function updatePost(id, prevState, formData) {
@@ -118,7 +118,7 @@ export async function updatePost(id, prevState, formData) {
   }
 
   revalidatePath('/admin/posts');
-  redirect('/admin/posts');
+  redirect('/admin/posts?flash=saved');
 }
 
 export async function deletePost(id) {
