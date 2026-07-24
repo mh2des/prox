@@ -33,7 +33,7 @@ export default async function Home({ params: { locale } }) {
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
-          <div className={styles.heroLabel}>ProEx Advisory</div>
+          <div className={styles.heroLabel}>{isAr ? 'بروإكس الاستشارية' : 'ProEx Advisory'}</div>
           <h1 className={styles.heroTitle}>
             {(() => {
               // Prefer the DB hero title (which holds both lines); render the
@@ -77,7 +77,7 @@ export default async function Home({ params: { locale } }) {
 
             {/* Left — slides in from left */}
             <ScrollReveal animation="fadeLeft" threshold={0.2}>
-              <span className={styles.chipTeal}>About Us</span>
+              <span className={styles.chipTeal}>{isAr ? 'من نحن' : 'About Us'}</span>
               <h2 className={styles.sectionTitle}>{h.whoTitle}</h2>
               <div className={styles.goldBar} />
             </ScrollReveal>
@@ -102,7 +102,7 @@ export default async function Home({ params: { locale } }) {
 
           <ScrollReveal animation="fadeUp">
             <div className={styles.sectionHeader}>
-              <span className={styles.chipGold}>Our Framework</span>
+              <span className={styles.chipGold}>{isAr ? 'منهجيتنا' : 'Our Framework'}</span>
               <h2 className={styles.sectionTitleWhite}>{h.traceTitle}</h2>
               <p className={styles.sectionSubWhite}>{h.traceSubtitle}</p>
             </div>
@@ -137,7 +137,7 @@ export default async function Home({ params: { locale } }) {
 
           <ScrollReveal animation="fadeUp">
             <div className={styles.sectionHeader}>
-              <span className={styles.chipTeal}>Who We Work With</span>
+              <span className={styles.chipTeal}>{isAr ? 'من نعمل معهم' : 'Who We Work With'}</span>
               <h2 className={styles.sectionTitle}>{h.sectorsTitle}</h2>
               <div className={styles.goldBarCenter} />
             </div>
@@ -172,7 +172,7 @@ export default async function Home({ params: { locale } }) {
 
             {/* Left text — slide from left */}
             <ScrollReveal animation="fadeLeft" threshold={0.15}>
-              <span className={styles.chipGold}>Portfolio</span>
+              <span className={styles.chipGold}>{isAr ? 'أعمالنا' : 'Portfolio'}</span>
               <h2 className={styles.sectionTitleWhite}>{h.workTitle}</h2>
               <div className={styles.workGoldBar} />
               <p className={styles.workDesc}>{h.workText}</p>
@@ -205,7 +205,7 @@ export default async function Home({ params: { locale } }) {
 
             {/* Text — fade up */}
             <ScrollReveal animation="fadeUp" threshold={0.15}>
-              <span className={styles.chipTeal}>Knowledge Hub</span>
+              <span className={styles.chipTeal}>{isAr ? 'مركز المعرفة' : 'Knowledge Hub'}</span>
               <h2 className={styles.sectionTitle}>{h.insightsTitle}</h2>
               <p className={styles.insightsDesc}>{h.insightsText}</p>
               <Link href={`/${locale}/media`} className={styles.btnPrimary}>{h.insightsBtn}</Link>
@@ -214,9 +214,9 @@ export default async function Home({ params: { locale } }) {
             {/* Badges — staggered from right */}
             <div className={styles.insightsDeco}>
               {[
-                { icon: '✦', label: 'Policy\nInsights' },
-                { icon: '◈', label: 'Research\nBriefs', alt: true },
-                { icon: '◉', label: 'Thought\nLeadership' },
+                { icon: '✦', label: isAr ? 'رؤى\nالسياسات' : 'Policy\nInsights' },
+                { icon: '◈', label: isAr ? 'موجزات\nبحثية' : 'Research\nBriefs', alt: true },
+                { icon: '◉', label: isAr ? 'قيادة\nفكرية' : 'Thought\nLeadership' },
               ].map((b, i) => (
                 <ScrollReveal key={i} animation="fadeLeft" delay={`${i * 0.15}s`} threshold={0.1}>
                   <div className={`${styles.insightsBadge} ${b.alt ? styles.insightsBadgeAlt : ''}`}>

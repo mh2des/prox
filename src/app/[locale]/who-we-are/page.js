@@ -86,7 +86,7 @@ export default async function WhoWeAre({ params: { locale } }) {
           </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" threshold={0.12}>
-            <VMVSplitCard vision={principles.vision} mission={principles.mission} />
+            <VMVSplitCard vision={principles.vision} mission={principles.mission} isAr={isAr} />
           </ScrollReveal>
         </div>
       </section>
@@ -105,7 +105,7 @@ export default async function WhoWeAre({ params: { locale } }) {
           </ScrollReveal>
 
           <ScrollReveal animation="fadeUp" delay="0.1s" threshold={0.08}>
-            <ValuesInfographic values={principles.values} />
+            <ValuesInfographic values={principles.values} isAr={isAr} />
           </ScrollReveal>
         </div>
       </section>

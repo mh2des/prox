@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import styles from "./VMVSplitCard.module.css";
 
-export default function VMVSplitCard({ vision, mission }) {
+export default function VMVSplitCard({ vision, mission, isAr }) {
   const visionTitle =
     vision?.title || "Shaping Institutional Excellence Across the Region";
   const missionTitle =
@@ -18,7 +18,7 @@ export default function VMVSplitCard({ vision, mission }) {
 
       {/* ── LEFT PANEL — Vision (white) ──────────────────────── */}
       <div className={styles.left}>
-        <p className={styles.panelChip}>Vision</p>
+        <p className={styles.panelChip}>{isAr ? 'الرؤية' : 'Vision'}</p>
         <h3 className={styles.panelTitle}>
           {visionTitle}
         </h3>
@@ -41,7 +41,7 @@ export default function VMVSplitCard({ vision, mission }) {
 
       {/* ── RIGHT PANEL — Mission (teal) ─────────────────────── */}
       <div className={styles.right}>
-        <p className={styles.panelChipWhite}>Mission</p>
+        <p className={styles.panelChipWhite}>{isAr ? 'الرسالة' : 'Mission'}</p>
         <h3 className={styles.panelTitleWhite}>
           {missionTitle}
         </h3>
@@ -53,17 +53,17 @@ export default function VMVSplitCard({ vision, mission }) {
         <div className={styles.missionStats}>
           <div className={styles.statItem}>
             <span className={styles.statNum}>50+</span>
-            <span className={styles.statLabel}>Institutions Served</span>
+            <span className={styles.statLabel}>{isAr ? 'مؤسسة خدمناها' : 'Institutions Served'}</span>
           </div>
           <div className={styles.statDivider} />
           <div className={styles.statItem}>
             <span className={styles.statNum}>12+</span>
-            <span className={styles.statLabel}>Years of Impact</span>
+            <span className={styles.statLabel}>{isAr ? 'سنوات من الأثر' : 'Years of Impact'}</span>
           </div>
           <div className={styles.statDivider} />
           <div className={styles.statItem}>
             <span className={styles.statNum}>3</span>
-            <span className={styles.statLabel}>Sectors</span>
+            <span className={styles.statLabel}>{isAr ? 'قطاعات' : 'Sectors'}</span>
           </div>
         </div>
       </div>

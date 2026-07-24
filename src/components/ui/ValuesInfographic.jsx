@@ -19,7 +19,7 @@ const DOT_POSITIONS = [
   { cx: 170, cy: 505 },
 ];
 
-export default function ValuesInfographic({ values }) {
+export default function ValuesInfographic({ values, isAr }) {
   const [inView, setInView] = useState(false);
   const ref = useRef(null);
 
@@ -52,9 +52,9 @@ export default function ValuesInfographic({ values }) {
         <div className={styles.hub}>
           <span className={styles.hubGlobe}>◉</span>
           <span className={styles.hubBrand}>ProEx</span>
-          <span className={styles.hubLabel}>Our Values</span>
+          <span className={styles.hubLabel}>{isAr ? 'قيمنا' : 'Our Values'}</span>
           <div className={styles.hubDivider} />
-          <span className={styles.hubSub}>Five Core Principles</span>
+          <span className={styles.hubSub}>{isAr ? 'خمسة مبادئ أساسية' : 'Five Core Principles'}</span>
         </div>
       </div>
 
