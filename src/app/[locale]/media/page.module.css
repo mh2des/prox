@@ -144,6 +144,9 @@
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .featuredCard { grid-template-columns: 1fr; }
+  /* Single-column: wrapper no longer gets height from grid stretch, so give the
+     fill <Image> a defined box to occupy (desktop keeps its stretched height). */
+  .featuredImgWrap { aspect-ratio: 16/9; }
   .articlesGrid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {

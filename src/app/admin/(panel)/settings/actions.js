@@ -65,5 +65,6 @@ export async function updateSettings(prevState, formData) {
   });
 
   revalidatePath('/admin/settings');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   return { ok: true };
 }

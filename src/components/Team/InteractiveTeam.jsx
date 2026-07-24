@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import styles from './InteractiveTeam.module.css';
 import TeamDetailModal from './TeamDetailModal';
 
@@ -110,10 +111,13 @@ export default function InteractiveTeam({ leaders, isAr }) {
           </div>
           
           <div className={styles.photoWrapper}>
-            <img 
+            <Image
               key={activeLeader.name} // Force re-render for animation
-              src={activeLeader.image} 
-              alt={activeLeader.name} 
+              src={activeLeader.image}
+              alt={activeLeader.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 500px"
+              priority
             />
           </div>
         </div>
@@ -141,7 +145,7 @@ export default function InteractiveTeam({ leaders, isAr }) {
                 }}
               >
                 <div className={styles.thumbImageContainer}>
-                  <img src={leader.image} alt={leader.name} />
+                  <Image src={leader.image} alt={leader.name} width={65} height={65} sizes="65px" />
                 </div>
                 <div className={styles.thumbName}>
                   {leader.name}

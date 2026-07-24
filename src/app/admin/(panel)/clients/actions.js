@@ -55,6 +55,7 @@ export async function createClient(prevState, formData) {
   await prisma.client.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/clients');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/clients?flash=saved');
 }
 
@@ -66,6 +67,7 @@ export async function updateClient(id, prevState, formData) {
   await prisma.client.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/clients');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/clients?flash=saved');
 }
 
@@ -73,4 +75,5 @@ export async function deleteClient(id) {
   await requireAuth();
   await prisma.client.delete({ where: { id } });
   revalidatePath('/admin/clients');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

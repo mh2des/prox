@@ -54,6 +54,7 @@ export async function createPrinciple(prevState, formData) {
   await prisma.principle.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/principles');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/principles?flash=saved');
 }
 
@@ -65,6 +66,7 @@ export async function updatePrinciple(id, prevState, formData) {
   await prisma.principle.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/principles');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/principles?flash=saved');
 }
 
@@ -72,4 +74,5 @@ export async function deletePrinciple(id) {
   await requireAuth();
   await prisma.principle.delete({ where: { id } });
   revalidatePath('/admin/principles');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

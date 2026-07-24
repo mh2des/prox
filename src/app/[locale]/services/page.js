@@ -2,7 +2,7 @@ import styles from './page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import { getPage, getPillars } from '../../../lib/content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 // TRACE icon SVGs
 const traceIcons = {

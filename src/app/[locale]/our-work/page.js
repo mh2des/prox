@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import styles from './page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import { getPage, getProjects } from '../../../lib/content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function OurWork({ params: { locale } }) {
   const isAr = locale === 'ar';
@@ -58,10 +59,11 @@ export default async function OurWork({ params: { locale } }) {
 
                 {project.image && (
                   <div className={styles.projectImageWrapper}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={project.image}
                       alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 800px"
                       className={styles.projectImage}
                     />
                   </div>

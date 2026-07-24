@@ -48,6 +48,7 @@ export async function createStat(prevState, formData) {
   await prisma.stat.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/stats');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/stats?flash=saved');
 }
 
@@ -59,6 +60,7 @@ export async function updateStat(id, prevState, formData) {
   await prisma.stat.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/stats');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/stats?flash=saved');
 }
 
@@ -66,4 +68,5 @@ export async function deleteStat(id) {
   await requireAuth();
   await prisma.stat.delete({ where: { id } });
   revalidatePath('/admin/stats');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

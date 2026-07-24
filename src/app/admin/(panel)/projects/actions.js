@@ -109,6 +109,7 @@ export async function createProject(prevState, formData) {
   }
 
   revalidatePath('/admin/projects');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/projects?flash=saved');
 }
 
@@ -132,6 +133,7 @@ export async function updateProject(id, prevState, formData) {
   }
 
   revalidatePath('/admin/projects');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/projects?flash=saved');
 }
 
@@ -139,4 +141,5 @@ export async function deleteProject(id) {
   await requireAuth();
   await prisma.project.delete({ where: { id } });
   revalidatePath('/admin/projects');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

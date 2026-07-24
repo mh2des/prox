@@ -3,7 +3,7 @@ import { getActiveJobs } from '../../../../lib/content';
 import JobsClient from './JobsClient';
 import styles from '../page.module.css';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function JobsPage({ params: { locale } }) {
   const t = getTranslations(locale);

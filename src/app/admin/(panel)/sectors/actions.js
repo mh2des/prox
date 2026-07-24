@@ -48,6 +48,7 @@ export async function createSector(prevState, formData) {
   await prisma.sector.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/sectors');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/sectors?flash=saved');
 }
 
@@ -59,6 +60,7 @@ export async function updateSector(id, prevState, formData) {
   await prisma.sector.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/sectors');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/sectors?flash=saved');
 }
 
@@ -66,4 +68,5 @@ export async function deleteSector(id) {
   await requireAuth();
   await prisma.sector.delete({ where: { id } });
   revalidatePath('/admin/sectors');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

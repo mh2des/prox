@@ -99,6 +99,7 @@ export async function createPost(prevState, formData) {
   }
 
   revalidatePath('/admin/posts');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/posts?flash=saved');
 }
 
@@ -118,6 +119,7 @@ export async function updatePost(id, prevState, formData) {
   }
 
   revalidatePath('/admin/posts');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/posts?flash=saved');
 }
 
@@ -125,4 +127,5 @@ export async function deletePost(id) {
   await requireAuth();
   await prisma.post.delete({ where: { id } });
   revalidatePath('/admin/posts');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

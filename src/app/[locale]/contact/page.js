@@ -2,7 +2,7 @@ import { getTranslations } from '../../../lib/i18n';
 import { getOffices, getPage } from '../../../lib/content';
 import ContactClient from './ContactClient';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function Contact({ params: { locale } }) {
   const t = getTranslations(locale);

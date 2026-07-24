@@ -4,7 +4,7 @@ import { getTranslations } from '../../lib/i18n';
 import { getPage, getStats, getSectors, getPillars } from '../../lib/content';
 import ScrollReveal from '../../components/ui/ScrollReveal';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 // ── Sector icons ────────────────────────────────────────────
 const GovIcon  = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg>;

@@ -79,6 +79,7 @@ export async function createTeamMember(prevState, formData) {
   await prisma.teamMember.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/team');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/team?flash=saved');
 }
 
@@ -90,6 +91,7 @@ export async function updateTeamMember(id, prevState, formData) {
   await prisma.teamMember.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/team');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/team?flash=saved');
 }
 
@@ -97,4 +99,5 @@ export async function deleteTeamMember(id) {
   await requireAuth();
   await prisma.teamMember.delete({ where: { id } });
   revalidatePath('/admin/team');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

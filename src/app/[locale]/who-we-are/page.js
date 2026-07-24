@@ -7,7 +7,7 @@ import { getPage, getPrinciples, getStats } from '../../../lib/content';
 import en from '../../../../messages/en.json';
 import ar from '../../../../messages/ar.json';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function WhoWeAre({ params: { locale } }) {
   const t = locale === 'ar' ? ar : en;

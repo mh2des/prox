@@ -1,10 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './page.module.css';
 import { getTranslations } from '../../../lib/i18n';
 import { getPublishedPosts, getPage } from '../../../lib/content';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 const articleImages = [
   'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
@@ -108,9 +109,12 @@ export default async function Media({ params: { locale } }) {
           <ScrollReveal animation="fadeUp">
             <div className={styles.featuredCard}>
               <div className={styles.featuredImgWrap}>
-                <img
+                <Image
                   src={featured.image}
                   alt={featured.title}
+                  fill
+                  priority
+                  sizes="(max-width: 900px) 100vw, 1200px"
                   className={styles.featuredImg}
                 />
                 <div className={styles.featuredImgOverlay} />
@@ -150,10 +154,11 @@ export default async function Media({ params: { locale } }) {
               {gridItems.map((article) => (
                 <Link key={article.key} href={article.href} className={styles.articleCard}>
                   <div className={styles.articleImgWrap}>
-                    {/* TODO: Use Next.js <Image /> for better performance */}
-                    <img
+                    <Image
                       src={article.image}
                       alt={article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 400px"
                       className={styles.articleImg}
                     />
                     <div className={styles.articleImgOverlay} />

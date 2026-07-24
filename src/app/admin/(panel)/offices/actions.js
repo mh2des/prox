@@ -58,6 +58,7 @@ export async function createOffice(prevState, formData) {
   await prisma.office.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/offices');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/offices?flash=saved');
 }
 
@@ -69,6 +70,7 @@ export async function updateOffice(id, prevState, formData) {
   await prisma.office.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/offices');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/offices?flash=saved');
 }
 
@@ -76,4 +78,5 @@ export async function deleteOffice(id) {
   await requireAuth();
   await prisma.office.delete({ where: { id } });
   revalidatePath('/admin/offices');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

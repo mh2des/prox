@@ -1,7 +1,7 @@
 import InteractiveTeam from '../../../components/Team/InteractiveTeam';
 import { getTeam, getPage } from '../../../lib/content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function LeadershipTeam({ params: { locale } }) {
   const isAr = locale === 'ar';

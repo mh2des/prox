@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import styles from './page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import { getPage, getClients } from '../../../lib/content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function OurClients({ params: { locale } }) {
   const isAr = locale === 'ar';
@@ -36,11 +37,13 @@ export default async function OurClients({ params: { locale } }) {
                 const inner = (
                   <div className={styles.clientLogo} title={client.desc || undefined}>
                     {client.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={client.image}
                         alt={client.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 200px"
                         className={styles.clientImage}
+                        style={{ objectFit: 'contain' }}
                       />
                     ) : (
                       <span className={styles.clientName}>{client.name}</span>

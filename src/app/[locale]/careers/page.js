@@ -4,7 +4,7 @@ import { getPage } from '../../../lib/content';
 import CareersClient from './CareersClient';
 import TabBar from './TabBar';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
 export default async function Careers({ params: { locale } }) {
   const t = getTranslations(locale);

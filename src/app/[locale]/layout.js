@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import '@uploadthing/react/styles.css';
 import '../globals.css';
 import Header from '../../components/layout/Header';
@@ -62,6 +63,20 @@ const navTranslations = {
 export default function RootLayout({ children, params: { locale } }) {
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   const nav = navTranslations[locale] ?? navTranslations.en;
+
+  // Preload only the two above-the-fold weights (body = medium/500,
+  // headings = bold/700) so the first paint doesn't wait on the font swap.
+  // crossOrigin is required even same-origin because fonts fetch in CORS mode.
+  ReactDOM.preload('/fonts/thmanyah-text-medium.woff2', {
+    as: 'font',
+    type: 'font/woff2',
+    crossOrigin: 'anonymous',
+  });
+  ReactDOM.preload('/fonts/thmanyah-text-bold.woff2', {
+    as: 'font',
+    type: 'font/woff2',
+    crossOrigin: 'anonymous',
+  });
 
   return (
     <html lang={locale} dir={dir}>

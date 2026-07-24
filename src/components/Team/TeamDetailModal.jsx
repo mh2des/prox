@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 import styles from './team.module.css';
 
 const CheckIcon = () => (
@@ -49,7 +50,7 @@ export default function TeamDetailModal({ member, onClose, isAr = false }) {
 
           <div className={styles.modalHeader}>
             <div className={styles.modalImgWrap}>
-              <img src={member.image} alt={member.name} className={styles.modalImg} />
+              <Image src={member.image} alt={member.name} className={styles.modalImg} width={140} height={140} />
             </div>
             <div className={styles.modalMeta}>
               <h2 className={styles.modalName}>{member.name}</h2>

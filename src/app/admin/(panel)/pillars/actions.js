@@ -63,6 +63,7 @@ export async function createPillar(prevState, formData) {
   await prisma.servicePillar.create({ data: toData(parsed.data) });
 
   revalidatePath('/admin/pillars');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/pillars?flash=saved');
 }
 
@@ -74,6 +75,7 @@ export async function updatePillar(id, prevState, formData) {
   await prisma.servicePillar.update({ where: { id }, data: toData(parsed.data) });
 
   revalidatePath('/admin/pillars');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/pillars?flash=saved');
 }
 
@@ -81,4 +83,5 @@ export async function deletePillar(id) {
   await requireAuth();
   await prisma.servicePillar.delete({ where: { id } });
   revalidatePath('/admin/pillars');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

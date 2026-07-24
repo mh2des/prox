@@ -102,6 +102,7 @@ export async function createJob(prevState, formData) {
   }
 
   revalidatePath('/admin/jobs');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/jobs?flash=saved');
 }
 
@@ -125,6 +126,7 @@ export async function updateJob(id, prevState, formData) {
   }
 
   revalidatePath('/admin/jobs');
+  revalidatePath('/', 'layout'); // refresh the cached public site
   redirect('/admin/jobs?flash=saved');
 }
 
@@ -132,4 +134,5 @@ export async function deleteJob(id) {
   await requireAuth();
   await prisma.job.delete({ where: { id } });
   revalidatePath('/admin/jobs');
+  revalidatePath('/', 'layout'); // refresh the cached public site
 }

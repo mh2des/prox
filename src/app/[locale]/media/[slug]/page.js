@@ -1,9 +1,21 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import styles from '../page.module.css';
 import { getPost } from '../../../../lib/content';
+import { prisma } from '../../../../lib/prisma';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
+
+// Pre-render every published article (both locales) at build time; any new
+// slug is generated on first request and then cached (dynamicParams default).
+export async function generateStaticParams() {
+  const posts = await prisma.post.findMany({
+    where: { status: 'PUBLISHED' },
+    select: { slug: true },
+  });
+  return ['en', 'ar'].flatMap((locale) => posts.map((p) => ({ locale, slug: p.slug })));
+}
 
 function formatDate(date, locale) {
   if (!date) return '';
@@ -69,18 +81,25 @@ export default async function ArticleDetail({ params: { locale, slug } }) {
           </Link>
 
           {post.featuredImage && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={post.featuredImage}
-              alt={post.title || ''}
+            <div
               style={{
+                position: 'relative',
                 width: '100%',
+                aspectRatio: '16 / 9',
                 borderRadius: '16px',
-                display: 'block',
+                overflow: 'hidden',
                 marginBottom: '2.5rem',
                 boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
               }}
-            />
+            >
+              <Image
+                src={post.featuredImage}
+                alt={post.title || ''}
+                fill
+                sizes="(max-width: 820px) 100vw, 820px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
           )}
 
           {metaParts.length > 0 && (
