@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
 import { deleteTeamMember } from './actions';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TeamList() {
+  const { t } = getAdminT();
   const members = await prisma.teamMember.findMany({
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
   });
@@ -14,26 +16,26 @@ export default async function TeamList() {
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Leadership</h1>
+          <h1 className="admin-page-title">{t('page.team.title')}</h1>
           <p className="admin-page-sub">
-            {members.length} member{members.length === 1 ? '' : 's'}
+            {members.length} {t('unit.team')}
           </p>
         </div>
         <Link href="/admin/team/new" className="btn btn-primary">
-          + New Member
+          {t('new.team')}
         </Link>
       </div>
 
       {members.length === 0 ? (
-        <div className="card empty">No team members yet. Create your first one.</div>
+        <div className="card empty">{t('empty.team')}</div>
       ) : (
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Status</th>
+                <th>{t('th.name')}</th>
+                <th>{t('th.position')}</th>
+                <th>{t('th.status')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -44,17 +46,17 @@ export default async function TeamList() {
                   <td>{m.positionEn || '—'}</td>
                   <td>
                     {m.published ? (
-                      <span className="badge badge-green">Published</span>
+                      <span className="badge badge-green">{t('status.published')}</span>
                     ) : (
-                      <span className="badge badge-muted">Hidden</span>
+                      <span className="badge badge-muted">{t('status.hidden')}</span>
                     )}
                   </td>
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/team/${m.id}`} className="btn btn-ghost btn-sm">
-                        Edit
+                        {t('action.edit')}
                       </Link>
-                      <DeleteButton action={deleteTeamMember.bind(null, m.id)} />
+                      <DeleteButton action={deleteTeamMember.bind(null, m.id)} label={t('action.delete')} confirmMessage={t('confirmDelete')} />
                     </div>
                   </td>
                 </tr>

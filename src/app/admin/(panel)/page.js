@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
+  const { t } = getAdminT();
   const [projects, team, clients, posts, jobs, unreadMessages, newApplications] =
     await Promise.all([
       prisma.project.count(),
@@ -17,24 +19,24 @@ export default async function AdminDashboard() {
 
   // Actionable inbox items — surfaced first so nothing waits unseen.
   const attention = [
-    { label: 'Unread messages', value: unreadMessages, href: '/admin/messages' },
-    { label: 'New applications', value: newApplications, href: '/admin/applications' },
+    { label: t('dash.unread'), value: unreadMessages, href: '/admin/messages' },
+    { label: t('dash.newApps'), value: newApplications, href: '/admin/applications' },
   ];
 
   const content = [
-    { label: 'Projects', value: projects, href: '/admin/projects' },
-    { label: 'Team members', value: team, href: '/admin/team' },
-    { label: 'Clients', value: clients, href: '/admin/clients' },
-    { label: 'Media posts', value: posts, href: '/admin/posts' },
-    { label: 'Active jobs', value: jobs, href: '/admin/jobs' },
+    { label: t('dash.projects'), value: projects, href: '/admin/projects' },
+    { label: t('dash.team'), value: team, href: '/admin/team' },
+    { label: t('dash.clients'), value: clients, href: '/admin/clients' },
+    { label: t('dash.posts'), value: posts, href: '/admin/posts' },
+    { label: t('dash.jobs'), value: jobs, href: '/admin/jobs' },
   ];
 
   return (
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Dashboard</h1>
-          <p className="admin-page-sub">Overview of your content and inbox.</p>
+          <h1 className="admin-page-title">{t('dash.title')}</h1>
+          <p className="admin-page-sub">{t('dash.sub')}</p>
         </div>
       </div>
 
@@ -56,7 +58,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="admin-nav-group" style={{ padding: '0 0 10px' }}>
-        Content
+        {t('nav.group.content')}
       </div>
       <div className="stat-grid">
         {content.map((s) => (

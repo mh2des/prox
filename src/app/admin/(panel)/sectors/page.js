@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
 import { deleteSector } from './actions';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SectorsList() {
+  const { t } = getAdminT();
   const sectors = await prisma.sector.findMany({
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
@@ -14,24 +16,24 @@ export default async function SectorsList() {
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Sectors</h1>
+          <h1 className="admin-page-title">{t('page.sectors.title')}</h1>
           <p className="admin-page-sub">
-            {sectors.length} sector{sectors.length === 1 ? '' : 's'}
+            {sectors.length} {t('unit.sectors')}
           </p>
         </div>
         <Link href="/admin/sectors/new" className="btn btn-primary">
-          + New Sector
+          {t('new.sector')}
         </Link>
       </div>
 
       {sectors.length === 0 ? (
-        <div className="card empty">No sectors yet. Create your first one.</div>
+        <div className="card empty">{t('empty.sectors')}</div>
       ) : (
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Title</th>
+                <th>{t('th.title')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -42,9 +44,9 @@ export default async function SectorsList() {
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/sectors/${s.id}`} className="btn btn-ghost btn-sm">
-                        Edit
+                        {t('action.edit')}
                       </Link>
-                      <DeleteButton action={deleteSector.bind(null, s.id)} />
+                      <DeleteButton action={deleteSector.bind(null, s.id)} label={t('action.delete')} confirmMessage={t('confirmDelete')} />
                     </div>
                   </td>
                 </tr>

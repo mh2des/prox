@@ -2,16 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { makeT } from '@/lib/admin-dict';
 
 // Success confirmations after a redirect-based save/delete. Server actions
 // redirect to `?flash=<key>`; this reads it, shows a banner, then strips the
 // param so a refresh doesn't re-show it. Rendered once in the panel layout.
-const MESSAGES = {
-  saved: 'Changes saved successfully.',
-  deleted: 'Deleted successfully.',
-};
-
-export default function FlashBanner() {
+export default function FlashBanner({ locale = 'en' }) {
+  const t = makeT(locale);
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -39,7 +36,7 @@ export default function FlashBanner() {
   return (
     <div className={`admin-flash${visible ? ' show' : ''}`} role="status" aria-live="polite">
       <span aria-hidden="true">✓</span>
-      {MESSAGES[key] || 'Done.'}
+      {key === 'deleted' ? t('flash.deleted') : t('flash.saved')}
     </div>
   );
 }

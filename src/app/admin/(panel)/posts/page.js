@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
 import { deletePost } from './actions';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PostsList() {
+  const { t } = getAdminT();
   const posts = await prisma.post.findMany({
     orderBy: [{ createdAt: 'desc' }],
   });
@@ -14,26 +16,26 @@ export default async function PostsList() {
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Media Posts</h1>
+          <h1 className="admin-page-title">{t('page.posts.title')}</h1>
           <p className="admin-page-sub">
-            {posts.length} post{posts.length === 1 ? '' : 's'}
+            {posts.length} {t('unit.posts')}
           </p>
         </div>
         <Link href="/admin/posts/new" className="btn btn-primary">
-          + New Post
+          {t('new.post')}
         </Link>
       </div>
 
       {posts.length === 0 ? (
-        <div className="card empty">No posts yet. Create your first one.</div>
+        <div className="card empty">{t('empty.posts')}</div>
       ) : (
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Status</th>
+                <th>{t('th.title')}</th>
+                <th>{t('th.author')}</th>
+                <th>{t('th.status')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -44,17 +46,17 @@ export default async function PostsList() {
                   <td>{p.author || '—'}</td>
                   <td>
                     {p.status === 'PUBLISHED' ? (
-                      <span className="badge badge-green">Published</span>
+                      <span className="badge badge-green">{t('status.published')}</span>
                     ) : (
-                      <span className="badge badge-muted">Draft</span>
+                      <span className="badge badge-muted">{t('status.draft')}</span>
                     )}
                   </td>
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/posts/${p.id}`} className="btn btn-ghost btn-sm">
-                        Edit
+                        {t('action.edit')}
                       </Link>
-                      <DeleteButton action={deletePost.bind(null, p.id)} />
+                      <DeleteButton action={deletePost.bind(null, p.id)} label={t('action.delete')} confirmMessage={t('confirmDelete')} />
                     </div>
                   </td>
                 </tr>

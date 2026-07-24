@@ -73,7 +73,7 @@
   width: 240px;
   flex-shrink: 0;
   background: var(--a-bg2);
-  border-right: 1px solid var(--a-border);
+  border-inline-end: 1px solid var(--a-border);
   display: flex;
   flex-direction: column;
   padding: 20px 14px;
@@ -132,6 +132,9 @@
   background: var(--a-primary-ghost);
   color: var(--a-primary-light);
   box-shadow: inset 3px 0 0 var(--a-primary-light);
+}
+[dir='rtl'] .admin-nav-item.active {
+  box-shadow: inset -3px 0 0 var(--a-primary-light);
 }
 .admin-nav-item.soon {
   opacity: 0.4;
@@ -668,11 +671,12 @@ a.card:hover {
 }
 
 @media (max-width: 860px) {
-  /* Sidebar becomes an off-canvas slide-in drawer. */
+  /* Sidebar becomes an off-canvas slide-in drawer (from the inline-start edge:
+     left in LTR, right in RTL). */
   .admin-sidebar {
     position: fixed;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     z-index: 80;
     height: 100dvh;
     transform: translateX(-100%);
@@ -680,7 +684,12 @@ a.card:hover {
     box-shadow: 2px 0 24px rgba(0, 0, 0, 0.4);
     width: 260px;
   }
-  .admin-sidebar.open {
+  [dir='rtl'] .admin-sidebar {
+    transform: translateX(100%);
+    box-shadow: -2px 0 24px rgba(0, 0, 0, 0.4);
+  }
+  .admin-sidebar.open,
+  [dir='rtl'] .admin-sidebar.open {
     transform: translateX(0);
   }
   .admin-drawer-overlay {
@@ -697,7 +706,7 @@ a.card:hover {
     justify-content: center;
     position: fixed;
     top: 10px;
-    left: 12px;
+    inset-inline-start: 12px;
     z-index: 60;
     width: 40px;
     height: 40px;
@@ -712,7 +721,8 @@ a.card:hover {
   }
   /* Keep topbar content clear of the floating hamburger. */
   .admin-topbar {
-    padding-left: 64px;
+    padding-inline-start: 64px;
+    padding-inline-end: 16px;
     justify-content: flex-end;
   }
   .admin-mobile-toggle:hover {

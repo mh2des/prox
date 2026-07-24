@@ -1,9 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import SettingsForm from './SettingsForm';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
+  const { t } = getAdminT();
   let setting = await prisma.setting.findUnique({ where: { id: 1 } });
   if (!setting) {
     setting = await prisma.setting.create({ data: { id: 1 } });
@@ -26,8 +28,8 @@ export default async function SettingsPage() {
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Settings</h1>
-          <p className="admin-page-sub">Manage global site and account settings.</p>
+          <h1 className="admin-page-title">{t('page.settings.title')}</h1>
+          <p className="admin-page-sub">{t('page.settings.sub')}</p>
         </div>
       </div>
       <SettingsForm setting={data} />

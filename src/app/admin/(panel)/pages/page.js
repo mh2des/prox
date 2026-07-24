@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,28 +12,29 @@ function prettySlug(slug) {
 }
 
 export default async function PagesList() {
+  const { t } = getAdminT();
   const pages = await prisma.page.findMany({ orderBy: { slug: 'asc' } });
 
   return (
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Pages</h1>
+          <h1 className="admin-page-title">{t('page.pages.title')}</h1>
           <p className="admin-page-sub">
-            {pages.length} page{pages.length === 1 ? '' : 's'}
+            {pages.length} {t('unit.pages')}
           </p>
         </div>
       </div>
 
       {pages.length === 0 ? (
-        <div className="card empty">No pages yet.</div>
+        <div className="card empty">{t('empty.pages')}</div>
       ) : (
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Page</th>
-                <th>Hero title</th>
+                <th>{t('th.page')}</th>
+                <th>{t('th.heroTitle')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -44,7 +46,7 @@ export default async function PagesList() {
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/pages/${pg.slug}`} className="btn btn-ghost btn-sm">
-                        Edit
+                        {t('action.edit')}
                       </Link>
                     </div>
                   </td>

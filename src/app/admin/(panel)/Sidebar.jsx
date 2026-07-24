@@ -3,46 +3,48 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { makeT } from '@/lib/admin-dict';
 
 const groups = [
-  { items: [{ href: '/admin', label: 'Dashboard' }] },
+  { items: [{ href: '/admin', key: 'nav.dashboard' }] },
   {
-    title: 'Content',
+    titleKey: 'nav.group.content',
     items: [
-      { href: '/admin/projects', label: 'Our Work' },
-      { href: '/admin/team', label: 'Team' },
-      { href: '/admin/clients', label: 'Clients' },
-      { href: '/admin/posts', label: 'Media Posts' },
+      { href: '/admin/projects', key: 'nav.projects' },
+      { href: '/admin/team', key: 'nav.team' },
+      { href: '/admin/clients', key: 'nav.clients' },
+      { href: '/admin/posts', key: 'nav.posts' },
     ],
   },
   {
-    title: 'Pages & Sections',
+    titleKey: 'nav.group.pages',
     items: [
-      { href: '/admin/pages', label: 'Pages' },
-      { href: '/admin/principles', label: 'Vision / Mission / Values' },
-      { href: '/admin/stats', label: 'Homepage Stats' },
-      { href: '/admin/sectors', label: 'Sectors' },
-      { href: '/admin/pillars', label: 'Services (TRACE)' },
-      { href: '/admin/offices', label: 'Offices' },
+      { href: '/admin/pages', key: 'nav.pages' },
+      { href: '/admin/principles', key: 'nav.principles' },
+      { href: '/admin/stats', key: 'nav.stats' },
+      { href: '/admin/sectors', key: 'nav.sectors' },
+      { href: '/admin/pillars', key: 'nav.pillars' },
+      { href: '/admin/offices', key: 'nav.offices' },
     ],
   },
   {
-    title: 'Inbox',
+    titleKey: 'nav.group.inbox',
     items: [
-      { href: '/admin/messages', label: 'Messages' },
-      { href: '/admin/jobs', label: 'Careers' },
-      { href: '/admin/applications', label: 'Applications' },
+      { href: '/admin/messages', key: 'nav.messages' },
+      { href: '/admin/jobs', key: 'nav.jobs' },
+      { href: '/admin/applications', key: 'nav.applications' },
     ],
   },
   {
-    title: 'System',
-    items: [{ href: '/admin/settings', label: 'Settings' }],
+    titleKey: 'nav.group.system',
+    items: [{ href: '/admin/settings', key: 'nav.settings' }],
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ locale = 'en' }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const t = makeT(locale);
 
   // Close the drawer whenever the route changes (a nav item was tapped).
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function Sidebar() {
       <button
         type="button"
         className="admin-mobile-toggle"
-        aria-label="Open navigation menu"
+        aria-label={t('openMenu')}
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
@@ -93,7 +95,7 @@ export default function Sidebar() {
           <button
             type="button"
             className="admin-drawer-close"
-            aria-label="Close navigation menu"
+            aria-label={t('closeMenu')}
             onClick={() => setOpen(false)}
           >
             <span aria-hidden="true">×</span>
@@ -102,16 +104,8 @@ export default function Sidebar() {
         <nav className="admin-nav">
           {groups.map((g, i) => (
             <div key={i}>
-              {g.title && <div className="admin-nav-group">{g.title}</div>}
+              {g.titleKey && <div className="admin-nav-group">{t(g.titleKey)}</div>}
               {g.items.map((item) => {
-                if (item.soon) {
-                  return (
-                    <span key={item.href} className="admin-nav-item soon">
-                      {item.label}
-                      <span style={{ marginLeft: 'auto', fontSize: 11 }}>soon</span>
-                    </span>
-                  );
-                }
                 const active =
                   item.href === '/admin'
                     ? pathname === '/admin'
@@ -122,7 +116,7 @@ export default function Sidebar() {
                     href={item.href}
                     className={`admin-nav-item${active ? ' active' : ''}`}
                   >
-                    {item.label}
+                    {t(item.key)}
                   </Link>
                 );
               })}

@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DeleteButton from '@/components/admin/DeleteButton';
 import { deletePrinciple } from './actions';
+import { getAdminT } from '@/lib/admin-i18n';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PrinciplesList() {
+  const { t } = getAdminT();
   const principles = await prisma.principle.findMany({
     orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }],
   });
@@ -14,25 +16,25 @@ export default async function PrinciplesList() {
     <>
       <div className="admin-page-head">
         <div>
-          <h1 className="admin-page-title">Vision / Mission / Values</h1>
+          <h1 className="admin-page-title">{t('page.principles.title')}</h1>
           <p className="admin-page-sub">
-            {principles.length} entr{principles.length === 1 ? 'y' : 'ies'}
+            {principles.length} {t('unit.principles')}
           </p>
         </div>
         <Link href="/admin/principles/new" className="btn btn-primary">
-          + New Entry
+          {t('new.principle')}
         </Link>
       </div>
 
       {principles.length === 0 ? (
-        <div className="card empty">No entries yet. Create your first one.</div>
+        <div className="card empty">{t('empty.principles')}</div>
       ) : (
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Title</th>
+                <th>{t('th.type')}</th>
+                <th>{t('th.title')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -46,9 +48,9 @@ export default async function PrinciplesList() {
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/principles/${p.id}`} className="btn btn-ghost btn-sm">
-                        Edit
+                        {t('action.edit')}
                       </Link>
-                      <DeleteButton action={deletePrinciple.bind(null, p.id)} />
+                      <DeleteButton action={deletePrinciple.bind(null, p.id)} label={t('action.delete')} confirmMessage={t('confirmDelete')} />
                     </div>
                   </td>
                 </tr>
