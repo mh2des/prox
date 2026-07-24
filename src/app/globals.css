@@ -87,23 +87,32 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  /* Thmanyah Text body face (Arabic + Latin). Medium weight + generous
-     line-height gives the editorial feel of the Thmanyah/irab type system. */
+  /* Thmanyah Text body face (Arabic + Latin), medium weight + airy line-height.
+     font-feature-settings is the key to Thmanyah's beauty (matches irab.app):
+     contextual alternates, kerning, ligatures, and — crucially — stylistic
+     alternates (salt) for the refined letterforms. */
   font-family: var(--font-primary);
   font-weight: 500;
   font-synthesis: none;
+  font-feature-settings: 'calt', 'kern', 'liga', 'salt';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.7;
 }
 
-/* Headings use the display face — Aref Ruqaa for Arabic, Thmanyah serif for
-   Latin. :where() carries zero specificity, so each page's own size/weight
-   still win; we only swap the family and stop faux-bold synthesis. */
+/* Headings: display face, and route family via zero-specificity :where so page
+   sizes still win. */
 :where(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-display);
-  font-weight: 700;
   font-synthesis: none;
+}
+
+/* Match irab's heading treatment: bold (700, not black) + tight tracking.
+   Uses element selectors + !important to override the per-page module weights
+   that were tuned for the old sans (900/800), which read clunky in the serif. */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
 }
 
 * {
