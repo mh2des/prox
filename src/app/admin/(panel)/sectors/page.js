@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic';
 export default async function SectorsList() {
   const { t } = getAdminT();
   const sectors = await prisma.sector.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    // Sector has no createdAt column — order by sortOrder only (matches getSectors).
+    orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
   });
 
   return (

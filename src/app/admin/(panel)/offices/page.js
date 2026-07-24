@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic';
 export default async function OfficesList() {
   const { t } = getAdminT();
   const offices = await prisma.office.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    // Office has no createdAt column — order by sortOrder only (matches getOffices).
+    orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
   });
 
   return (
