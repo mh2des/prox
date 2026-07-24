@@ -29,6 +29,15 @@ function ApplyForm({ job, isAr, onCancel }) {
   return (
     <form action={formAction} style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       <input type="hidden" name="jobId" value={job.id} />
+      {/* Honeypot — hidden from humans, filled by bots (silently dropped). */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+      />
       {state?.error && <p style={{ color: '#e05b5b', margin: 0 }}>{state.error}</p>}
       <input name="fullName" placeholder={isAr ? 'الاسم الكامل' : 'Full name'} className={styles.filterInput} required />
       <input type="email" name="email" placeholder={isAr ? 'البريد الإلكتروني' : 'Email'} className={styles.filterInput} required />

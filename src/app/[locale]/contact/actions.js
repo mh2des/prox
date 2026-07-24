@@ -15,6 +15,13 @@ const schema = z.object({
 // Public contact form → creates a Message row that appears in the admin inbox.
 export async function submitContact(prevState, formData) {
   const get = (k) => (formData.get(k) ?? '').toString().trim();
+
+  // Honeypot: a hidden field real users never see. If it's filled, a bot
+  // submitted the form — pretend success so the bot moves on, but store nothing.
+  if (get('website')) {
+    return { ok: true };
+  }
+
   const parsed = schema.safeParse({
     name: get('name'),
     email: get('email'),

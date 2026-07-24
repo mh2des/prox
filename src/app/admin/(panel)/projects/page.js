@@ -43,7 +43,14 @@ export default async function ProjectsList() {
             <tbody>
               {projects.map((p) => (
                 <tr key={p.id}>
-                  <td style={{ fontWeight: 600 }}>{p.titleEn}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {p.titleEn}
+                    {!p.titleAr && (
+                      <span className="badge badge-yellow" style={{ marginInlineStart: 8, fontWeight: 500 }}>
+                        {t('requiredLang')}
+                      </span>
+                    )}
+                  </td>
                   <td>{p.client || '—'}</td>
                   <td>{p.year || '—'}</td>
                   <td>

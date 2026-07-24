@@ -42,7 +42,14 @@ export default async function PostsList() {
             <tbody>
               {posts.map((p) => (
                 <tr key={p.id}>
-                  <td style={{ fontWeight: 600 }}>{p.titleEn}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {p.titleEn}
+                    {!p.titleAr && (
+                      <span className="badge badge-yellow" style={{ marginInlineStart: 8, fontWeight: 500 }}>
+                        {t('requiredLang')}
+                      </span>
+                    )}
+                  </td>
                   <td>{p.author || '—'}</td>
                   <td>
                     {p.status === 'PUBLISHED' ? (

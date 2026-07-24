@@ -4,7 +4,13 @@
 // the database and bcrypt — is added on top of this in src/auth.js.
 export const authConfig = {
   trustHost: true,
-  session: { strategy: 'jwt' },
+  session: {
+    strategy: 'jwt',
+    // Admin sessions last a workday and slide forward on activity, instead of
+    // the 30-day default — much safer for a CMS on shared/office machines.
+    maxAge: 8 * 60 * 60, // 8 hours
+    updateAge: 60 * 60, // refresh the token at most once per hour of activity
+  },
   pages: {
     signIn: '/admin/login',
   },

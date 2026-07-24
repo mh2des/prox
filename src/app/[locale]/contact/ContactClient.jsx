@@ -129,6 +129,16 @@ export default function ContactClient({ locale, offices, labels, page }) {
             </p>
           ) : (
             <form className={styles.form} action={formAction}>
+              {/* Honeypot: hidden from humans, tempting to bots. Kept off-screen
+                  (not display:none, which some bots skip) and out of the tab order. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+              />
               {state?.error && (
                 <p style={{ color: '#e05b5b', marginBottom: '1rem' }}>{state.error}</p>
               )}

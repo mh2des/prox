@@ -23,6 +23,12 @@ const schema = z.object({
 // Public careers form → creates an Application row in the admin inbox.
 export async function submitApplication(prevState, formData) {
   const get = (k) => (formData.get(k) ?? '').toString().trim();
+
+  // Honeypot — silently accept-and-drop bot submissions.
+  if (get('website')) {
+    return { ok: true };
+  }
+
   const parsed = schema.safeParse({
     jobId: get('jobId'),
     fullName: get('fullName'),

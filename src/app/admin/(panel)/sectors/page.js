@@ -40,7 +40,14 @@ export default async function SectorsList() {
             <tbody>
               {sectors.map((s) => (
                 <tr key={s.id}>
-                  <td style={{ fontWeight: 600 }}>{s.titleEn}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {s.titleEn}
+                    {!s.titleAr && (
+                      <span className="badge badge-yellow" style={{ marginInlineStart: 8, fontWeight: 500 }}>
+                        {t('requiredLang')}
+                      </span>
+                    )}
+                  </td>
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/sectors/${s.id}`} className="btn btn-ghost btn-sm">

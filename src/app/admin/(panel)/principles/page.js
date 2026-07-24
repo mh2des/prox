@@ -44,7 +44,14 @@ export default async function PrinciplesList() {
                   <td>
                     <span className="badge badge-muted">{p.type}</span>
                   </td>
-                  <td style={{ fontWeight: 600 }}>{p.titleEn}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {p.titleEn}
+                    {!p.titleAr && (
+                      <span className="badge badge-yellow" style={{ marginInlineStart: 8, fontWeight: 500 }}>
+                        {t('requiredLang')}
+                      </span>
+                    )}
+                  </td>
                   <td>
                     <div className="row-actions">
                       <Link href={`/admin/principles/${p.id}`} className="btn btn-ghost btn-sm">

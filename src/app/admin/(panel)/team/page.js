@@ -42,7 +42,14 @@ export default async function TeamList() {
             <tbody>
               {members.map((m) => (
                 <tr key={m.id}>
-                  <td style={{ fontWeight: 600 }}>{m.name}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {m.name}
+                    {!m.positionAr && (
+                      <span className="badge badge-yellow" style={{ marginInlineStart: 8, fontWeight: 500 }}>
+                        {t('requiredLang')}
+                      </span>
+                    )}
+                  </td>
                   <td>{m.positionEn || '—'}</td>
                   <td>
                     {m.published ? (
