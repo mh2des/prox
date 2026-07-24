@@ -62,8 +62,9 @@
   /* Constraints */
   --max-width: 1280px;
   
-  /* Fonts */
-  --font-primary: 'Thmanyah Text', system-ui, -apple-system, sans-serif;
+  /* Fonts — Thmanyah type system: one serif family, headings in the bold cut */
+  --font-primary: 'Thmanyah Text', system-ui, -apple-system, sans-serif; /* body / text */
+  --font-display: 'Thmanyah Text', system-ui, serif;                     /* headings (bold) */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -86,11 +87,23 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  /* Thmanyah Text end-to-end (Arabic + Latin), system-ui fallback. */
+  /* Thmanyah Text body face (Arabic + Latin). Medium weight + generous
+     line-height gives the editorial feel of the Thmanyah/irab type system. */
   font-family: var(--font-primary);
+  font-weight: 500;
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  line-height: 1.7;
+}
+
+/* Headings use the display face — Aref Ruqaa for Arabic, Thmanyah serif for
+   Latin. :where() carries zero specificity, so each page's own size/weight
+   still win; we only swap the family and stop faux-bold synthesis. */
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-synthesis: none;
 }
 
 * {
