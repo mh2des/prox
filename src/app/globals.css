@@ -47,10 +47,17 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-primary);
+  /* Latin renders in Inter; Arabic glyphs fall through to IBM Plex Sans Arabic. */
+  font-family: var(--font-primary), var(--font-arabic), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+}
+
+/* Prefer the Arabic face first on RTL pages for better shaping/spacing. */
+[dir='rtl'] body,
+html[lang='ar'] body {
+  font-family: var(--font-arabic), var(--font-primary), sans-serif;
 }
 
 * {

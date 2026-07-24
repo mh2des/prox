@@ -1,10 +1,16 @@
-import { Inter } from 'next/font/google';
+import { Inter, IBM_Plex_Sans_Arabic } from 'next/font/google';
 import '@uploadthing/react/styles.css';
 import '../globals.css';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-primary' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-primary', display: 'swap' });
+const plexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-arabic',
+  display: 'swap',
+});
 
 export async function generateMetadata({ params: { locale } }) {
   const isAr = locale === 'ar';
@@ -68,7 +74,7 @@ export default function RootLayout({ children, params: { locale } }) {
 
   return (
     <html lang={locale} dir={dir}>
-      <body className={inter.variable}>
+      <body className={`${inter.variable} ${plexArabic.variable}`}>
         <Header locale={locale} nav={nav} />
         <main>{children}</main>
         <Footer locale={locale} />

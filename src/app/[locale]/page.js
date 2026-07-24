@@ -13,6 +13,7 @@ const CivIcon  = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height
 const sectorIcons = [GovIcon, PrivIcon, CivIcon];
 
 export default async function Home({ params: { locale } }) {
+  const isAr = locale === 'ar';
   const t = getTranslations(locale);
   const h = t.home;
 
@@ -34,13 +35,36 @@ export default async function Home({ params: { locale } }) {
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroLabel}>ProEx Advisory</div>
           <h1 className={styles.heroTitle}>
-            {page?.heroTitle || h.heroTitle}<br />
-            <span className={styles.heroHighlight}>{h.heroHighlight}</span>
+            {(() => {
+              // Prefer the DB hero title (which holds both lines); render the
+              // first line normally and the remainder as the gold highlight.
+              if (page?.heroTitle) {
+                const [first, ...rest] = page.heroTitle.split('\n');
+                return (
+                  <>
+                    {first}
+                    {rest.length > 0 && (
+                      <><br /><span className={styles.heroHighlight}>{rest.join(' ')}</span></>
+                    )}
+                  </>
+                );
+              }
+              return (
+                <>
+                  {h.heroTitle}<br />
+                  <span className={styles.heroHighlight}>{h.heroHighlight}</span>
+                </>
+              );
+            })()}
           </h1>
           <p className={styles.heroSubtitle}>{page?.heroSubtitle || h.heroSubtitle}</p>
           <div className={styles.heroActions}>
-            <Link href={`/${locale}/contact`} className={styles.heroBtnPrimary}>Contact Us</Link>
-            <Link href={`/${locale}/who-we-are`}   className={styles.heroBtnOutline}>Who We Are</Link>
+            <Link href={`/${locale}/contact`} className={styles.heroBtnPrimary}>
+              {isAr ? 'اتصل بنا' : 'Contact Us'}
+            </Link>
+            <Link href={`/${locale}/who-we-are`} className={styles.heroBtnOutline}>
+              {isAr ? 'من نحن' : 'Who We Are'}
+            </Link>
           </div>
         </div>
         <div className={styles.heroBar} />
