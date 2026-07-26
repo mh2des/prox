@@ -4,16 +4,25 @@
 
 .page {
   background: #ffffff;
+  /* svh = smallest viewport height, so a short page (e.g. no published
+     clients) can't become 1 toolbar-height taller than the visible viewport
+     on mobile Safari/Chrome and produce a phantom vertical scroll. The vh
+     line stays first as the fallback for browsers without svh. */
   min-height: 100vh;
+  min-height: 100svh;
   color: #121212;
 }
 
 /* ── HERO ──────────────────────────────────────────────── */
 .hero {
   position: relative;
-  padding: 10rem 0 6rem;
+  /* Was a hard `10rem 0 6rem`. --section-y is 108px at >=1280px, so this is
+     108 * 5/3 = 180px top and 108px bottom there — pixel-identical to the old
+     10rem/6rem at the desktop root size — and it now rides the global
+     vertical rhythm down to 75px/45px on a 375px phone instead of staying
+     frozen at ~129px of dead space above the title. */
+  padding: calc(var(--section-y) * 5 / 3) 0 var(--section-y);
   background-color: #139088;
-  background-image: url('https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=2000&q=80');
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -46,10 +55,19 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
+  /* An inline-block shrink-wraps, but uppercase + 0.12em tracking on a long
+     CMS badge ("TRUSTED PARTNERS ACROSS THE REGION") can still out-measure a
+     320px column. Cap it and let it wrap instead of widening the page. */
+  max-width: 100%;
 }
 
 .heroTitle {
-  font-size: clamp(2.4rem, 5vw, 4rem);
+  /* Was clamp(2.4rem, 5vw, 4rem). The 2.4rem floor was still ~36px at 430px
+     wide and then the old 480px media query dropped it to 27px in one step —
+     a visible jump right at the breakpoint. A single continuous curve with a
+     1.9rem floor removes the jump and keeps >=1280px identical: 5vw wins from
+     ~380px up to 1440px, where the 4rem cap takes over exactly as before. */
+  font-size: clamp(1.9rem, 5vw, 4rem);
   font-weight: 950;
   color: #fff;
   line-height: 1.1;
@@ -61,12 +79,17 @@
   width: 60px;
   height: 4px;
   background: #ffffff;
-  margin: 0 auto 2.5rem;
+  /* 2.5rem (45px) preserved at >=1280px, tightened to ~1.5rem on phones where
+     45px between the rule and the subtitle reads as a broken layout. */
+  margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
   border-radius: 4px;
 }
 
 .heroSubtitle {
-  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  /* Same jump as .heroTitle: the 1.1rem floor held until 480px and then the
+     media query snapped to 1rem. One continuous clamp instead — 1.25rem
+     (22.5px) at >=1280px is unchanged. */
+  font-size: clamp(1rem, 2vw, 1.25rem);
   color: rgba(255,255,255,0.85);
   line-height: 1.8;
   margin: 0 auto;
@@ -74,38 +97,59 @@
 
 /* ── CLIENTS GRID ──────────────────────────────────────── */
 .clientsSection {
-  padding: 6rem 0 10rem;
+  /* Was `6rem 0 10rem`. Identical at >=1280px (108px / 180px) via the shared
+     rhythm token, but 30px/45px at 480px instead of the old frozen 2rem/3rem
+     step that only kicked in at one breakpoint. */
+  padding: var(--section-y) 0 calc(var(--section-y) * 5 / 3);
   background: #ffffff;
 }
 
 .clientsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 2.5rem;
+  /* 220px (not 250px) as the track floor so the 4 -> 3 column transition lands
+     at ~1035px, i.e. BELOW the explicit 3-column rule at 1024px. With the old
+     250px floor the count went 3 cols at 1030px, 2 cols at 800px, then back UP
+     to 3 cols at 768px when the media query swapped the floor to 200px —
+     narrowing the window made the cards suddenly shrink. Column count is now
+     monotonic. min(...,100%) stops the track floor from ever exceeding the
+     container at 320px. Verified: still exactly 4 columns at 1280/1440/1920. */
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  /* 2.5rem (45px) at >=1280px, unchanged; 15px on a phone, where 45px of gutter
+     between two ~140px cards was eating a third of the row. */
+  gap: clamp(1rem, 3.6vw, 2.5rem);
 }
 
 .clientCard {
   background: #ffffff;
   border: 2px solid #e8e8e8;
   border-radius: 16px;
-  padding: 2rem;
+  /* 2rem = 36px at >=1280px (unchanged). At 320px the old flat 2rem left only
+     ~78px of a 137px card for the logo — more chrome than content. */
+  padding: clamp(0.875rem, 3vw, 2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  min-height: 220px;
+  /* 220px at >=1280px (17.25vw crosses 220 at 1276px so the cap is already in
+     force there). Below that it is only a floor — the logo's aspect-ratio
+     drives the real height — which stops the card from forcing 40-90px of
+     dead space under a small logo on tablets and phones. */
+  min-height: clamp(120px, 17.25vw, 220px);
   position: relative;
   overflow: hidden;
+  /* Grid items default to min-width:auto; a long unbroken client name in the
+     no-logo fallback could otherwise refuse to shrink and widen the row. */
+  min-width: 0;
 }
 
 .clientCard::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  /* Logical, so the accent bar spans correctly in both directions. */
+  inset-inline: 0;
   height: 3px;
   background: #139088;
   transform: scaleX(0);
@@ -113,21 +157,40 @@
   transform-origin: left;
 }
 
-.clientCard:hover {
-  transform: translateY(-8px);
-  background: #ffffff;
-  border-color: #139088;
-  box-shadow: 0 12px 32px rgba(19,144,136,0.15);
+/* transform-origin takes no logical keyword, so RTL needs its own rule —
+   otherwise the Arabic build wipes the accent bar in from the left, against
+   the reading direction. */
+[dir="rtl"] .clientCard::before {
+  transform-origin: right;
 }
 
-.clientCard:hover::before {
-  transform: scaleX(1);
+/* The anchor is a flex item of a column flex container with
+   align-items:center, so its cross size is fit-content, not stretch. A
+   next/image `fill` child is absolutely positioned and contributes ZERO
+   intrinsic width, so the anchor collapsed to 0px and .clientLogo's
+   `width:100%` resolved against 0 — every client that has BOTH a logo and a
+   website URL rendered as an invisible card at every viewport. */
+.clientLink {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.clientLink:focus-visible {
+  outline: 2px solid #139088;
+  outline-offset: 3px;
 }
 
 .clientLogo {
   position: relative;
   width: 100%;
-  height: 150px;
+  /* Was a fixed 150px stepped down to 120px at 480px. A logo box whose height
+     is fixed while its width is fluid changes shape at every viewport — at
+     320px the old rule produced a 111x120 portrait well for what are almost
+     always landscape wordmarks. 4/3 reproduces the desktop box almost exactly
+     (200.75px wide x 150.6px tall at 1280px vs. the old 150px) and then keeps
+     that shape at every width, so no logo is ever squeezed. */
+  aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,10 +200,23 @@
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.clientCard:hover .clientLogo {
-  background: linear-gradient(135deg, #f0f0f0 0%, #e8f5f3 100%);
-  transform: scale(1.08) rotate(-1deg);
-  box-shadow: 0 12px 24px rgba(19,144,136,0.2);
+/* Fallback when a client has no uploaded logo. This element had NO rule at all
+   in the module: it inherited the 1.85 body leading at full body size inside a
+   fixed-height overflow:hidden box, so any name past two lines was sliced
+   mid-glyph, and at 320px a long name was clipped after a few characters.
+   Deliberately restricted to sizing/wrapping safety — colour and weight stay
+   inherited so the >=1280px rendering is unchanged. The 1rem ceiling equals
+   the size it already inherited at desktop. */
+.clientName {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: clamp(0.8rem, 2.2vw, 1rem);
+  line-height: 1.35;
+  padding-inline: 0.5rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .clientImage {
@@ -153,25 +229,70 @@
   filter: brightness(0.95) contrast(1) saturate(1);
 }
 
-.clientCard:hover .clientImage {
-  transform: scale(1.12) rotate(2deg);
-  filter: brightness(1.1) contrast(1.15) saturate(1.25) drop-shadow(0 4px 12px rgba(19,144,136,0.15));
+/* Hover is gated behind a real pointer. On touch, :hover latches after a tap
+   and does not clear until you tap elsewhere, so tapping a client left the
+   card permanently lifted 8px with the logo scaled 1.08 and rotated -1deg —
+   and inside the card's overflow:hidden, a stuck 1.12 scale on the image
+   clipped the logo on narrow cards. Desktop rendering is untouched. */
+@media (hover: hover) and (pointer: fine) {
+  .clientCard:hover {
+    transform: translateY(-8px);
+    background: #ffffff;
+    border-color: #139088;
+    box-shadow: 0 12px 32px rgba(19,144,136,0.15);
+  }
+
+  .clientCard:hover::before {
+    transform: scaleX(1);
+  }
+
+  .clientCard:hover .clientLogo {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8f5f3 100%);
+    transform: scale(1.08) rotate(-1deg);
+    box-shadow: 0 12px 24px rgba(19,144,136,0.2);
+  }
+
+  .clientCard:hover .clientImage {
+    transform: scale(1.12) rotate(2deg);
+    filter: brightness(1.1) contrast(1.15) saturate(1.25) drop-shadow(0 4px 12px rgba(19,144,136,0.15));
+  }
 }
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .hero { padding: 8rem 0 4rem; }
-  .clientsSection { padding: 4rem 0 6rem; }
-  .clientCard { padding: 1.5rem; min-height: 180px; }
-  .clientsGrid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+/* Hero padding, section rhythm, type scale, grid gap, card padding, card
+   min-height and the logo box are all fluid now (clamp / aspect-ratio /
+   --section-y), so they need no breakpoint steps at all. What is left below is
+   the one thing that genuinely cannot be interpolated — the column count —
+   plus the mobile hero artwork. Counts are pinned so they can only ever
+   decrease as the viewport narrows: 4 (>~1035px) -> 3 -> 2. */
+
+@media (max-width: 1024px) {
+  .clientsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 480px) {
-  .hero { padding: 6rem 0 3rem; }
-  .heroTitle { font-size: clamp(1.8rem, 4vw, 2.8rem); }
-  .heroSubtitle { font-size: 1rem; }
-  .clientsSection { padding: 2rem 0 3rem; }
-  .clientsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
-  .clientCard { padding: 1rem; min-height: 150px; }
-  .clientLogo { height: 120px; }
+@media (max-width: 768px) {
+}
+
+@media (max-width: 600px) {
+  /* 3 columns below this leaves a ~134px logo box, which is under the useful
+     size for a wordmark. Two columns is the floor — a single-column logo wall
+     reads as a broken list rather than a client roster. */
+  .clientsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  /* Smallest phones (320-380px): the fluid clamps have bottomed out on their
+     rem floors, which are still ~13px of card padding + 15px of gutter out of
+     a 290px row. Reclaim ~10px per card for the logo itself. */
+  .clientsGrid {
+    gap: 0.75rem;
+  }
+
+  .clientCard {
+    padding: 0.75rem;
+  }
 }

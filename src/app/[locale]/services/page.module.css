@@ -6,7 +6,11 @@
 @keyframes heroFadeIn  { from { opacity:0; } to { opacity:1; } }
 @keyframes shimmer     { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
 
-.page { overflow-x: hidden; }
+/* `clip` rather than `hidden`: `overflow-x: hidden` forces the used value of
+   overflow-y to `auto`, which turns this wrapper into a scroll container and
+   silently breaks position:sticky for anything nested inside it. `clip` leaves
+   overflow-y visible. The `hidden` line stays first as the Safari <16 fallback. */
+.page { overflow-x: hidden; overflow-x: clip; }
 
 /* ── Shared ───────────────────────────────────────────────── */
 .sectionTitle {
@@ -17,10 +21,13 @@
   margin-bottom: 0.5rem;
 }
 .chipTeal {
-  display: inline-block;
+  display: inline-block; max-width: 100%;
   background: rgba(19,144,136,0.12);
   color: var(--color-primary);
-  font-size: 0.72rem; font-weight: 700;
+  /* 0.72rem is 12.96px at the 18px desktop root but only 10.8px once the fluid
+     root drops to 15px on phones — unreadable for uppercase + letter-spacing.
+     max() keeps the desktop size and floors the phone size at 12px. */
+  font-size: max(0.72rem, 12px); font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
   padding: 0.35rem 0.9rem; border-radius: 100px; margin-bottom: 1rem;
 }
@@ -48,22 +55,41 @@
 .hero {
   position: relative; min-height: 60vh; display: flex; align-items: center;
   background-color: #0a1f1e;
-  background-image: url('https://images.unsplash.com/photo-1568992687947-868a62a9f521?auto=format&fit=crop&w=2000&q=80');
   background-size: cover; background-position: center; overflow: hidden;
 }
 .heroOverlay {
   position: absolute; inset: 0;
   background: linear-gradient(120deg, rgba(10,31,30,0.93) 0%, rgba(10,31,30,0.72) 60%, rgba(10,31,30,0.48) 100%);
 }
+/* The scrim is darkest on the side the copy sits on. In Arabic the copy moves to
+   the inline-start = right edge, where the LTR gradient is only 48% opaque, so the
+   white hero text lands on the bright part of the photo. Mirror the angle for RTL. */
+[dir="rtl"] .heroOverlay {
+  background: linear-gradient(-120deg, rgba(10,31,30,0.93) 0%, rgba(10,31,30,0.72) 60%, rgba(10,31,30,0.48) 100%);
+}
 .heroBar {
   position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
   background-size: 200% 100%; animation: shimmer 3s linear infinite;
 }
-.heroInner { position: relative; z-index: 2; max-width: 780px; padding: 2rem 0; }
+/* This element also carries the global `.container` class, and its `padding: 2rem 0`
+   shorthand silently zeroed .container's padding-left/right (identical specificity,
+   page CSS ships after layout CSS — verified in .next/app-build-manifest.json).
+   Harmless while the 780px cap keeps the box off the viewport edges, but at <=780px
+   the box fills the screen and the hero copy ran flush into both edges.
+   Longhands now, so the two rules can no longer collide; the horizontal gutter is
+   deliberately kept at 0 above 1024px to leave the desktop measure untouched and is
+   restored in the 1024px block below. */
+.heroInner {
+  position: relative; z-index: 2; max-width: 780px;
+  padding-top: 2rem; padding-bottom: 2rem;
+  padding-left: 0; padding-right: 0;
+}
 .heroChip {
-  display: inline-block; background: rgba(197,160,89,0.2); border: 1px solid rgba(197,160,89,0.4);
-  color: var(--color-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em;
+  display: inline-block; max-width: 100%;
+  background: rgba(197,160,89,0.2); border: 1px solid rgba(197,160,89,0.4);
+  /* floored at 12px — 0.75rem is 11.25px at the phone root */
+  color: var(--color-secondary); font-size: max(0.75rem, 12px); font-weight: 700; letter-spacing: 0.18em;
   text-transform: uppercase; padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.5rem;
   animation: heroFadeIn 0.7s ease both; animation-delay: 0.2s;
 }
@@ -77,19 +103,34 @@
 }
 
 /* ── 2. INTRO ─────────────────────────────────────────────── */
-.intro { padding: 6rem 0; background: #fff; }
-.introInner { text-align: left; max-width: 860px; margin: 0; }
-.introText { color: var(--color-gray-500); font-size: 1.05rem; line-height: 1.8; margin-top: 1.5rem; }
+/* var(--section-y) is 108px at >=1280px — identical to the old 6rem — and steps
+   down to 45px on a phone instead of staying at a fixed 90px block of dead space. */
+.intro { padding: var(--section-y) 0; background: #fff; }
+/* `start`, not `left`: in Arabic (dir=rtl) this block must align to the right. */
+.introInner { text-align: start; max-width: 860px; margin: 0; }
+.introText { color: var(--color-gray-500); font-size: max(1.05rem, 16px); line-height: 1.8; margin-top: 1.5rem; }
 .introText p { margin-bottom: 1rem; }
 .introText p:last-child { margin-bottom: 0; }
 
 /* ── 3. PILLARS ───────────────────────────────────────────── */
-.pillars { padding: 2rem 0 7rem; background: var(--color-gray-50); }
-.pillarsGrid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+/* Expressed against --section-y so the rhythm shrinks with the viewport while
+   resolving to exactly 2rem / 7rem (36px / 126px) at >=1280px. */
+.pillars {
+  padding: calc(var(--section-y) / 3) 0 calc(var(--section-y) * 7 / 6);
+  background: var(--color-gray-50);
 }
+.pillarsGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
+}
+/* The grid items are the ScrollReveal wrappers, not the cards. Without min-width:0
+   their automatic minimum size is the content's min-content width, so one long
+   unbroken CMS string (a URL, a long Arabic compound) makes a 1fr track refuse to
+   shrink and pushes the whole row past the viewport. */
+.pillarsGrid > * { min-width: 0; }
 .pillarCard {
-  background: #fff; border-radius: 14px; padding: 2rem 1.75rem;
+  background: #fff; border-radius: 14px;
+  padding: clamp(1.5rem, 4vw, 2rem) clamp(1.25rem, 4vw, 1.75rem);
+  min-width: 0; max-width: 100%;
   box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1.5px solid var(--color-gray-200, #eaeaea);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; height: 100%;
 }
@@ -103,6 +144,9 @@
   margin-bottom: 1.25rem;
   color: var(--color-primary);
 }
+/* the global `svg { max-width: 100% }` guard lets the 26px icon squash inside a
+   narrow flex row; it is a fixed-size glyph, so opt it out */
+.pillarIconWrap svg { flex-shrink: 0; }
 .traceLetter {
   display: inline-flex; align-items: center; justify-content: center;
   width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
@@ -111,8 +155,19 @@
   transition: background 0.25s;
 }
 .pillarCard:hover .traceLetter { background: var(--color-secondary); }
-.pillarTitle { font-size: 1.08rem; font-weight: 800; color: var(--color-dark); margin-bottom: 0.75rem; }
-.pillarDesc { font-size: 0.925rem; color: var(--color-gray-500); line-height: 1.7; margin-bottom: 1.25rem; }
+/* overflow-wrap:anywhere (not the global break-word) because these render CMS
+   copy: `anywhere` also lowers the min-content contribution, which is what
+   actually stops a long token from widening the grid track. */
+.pillarTitle {
+  font-size: 1.08rem; font-weight: 800; color: var(--color-dark); margin-bottom: 0.75rem;
+  overflow-wrap: anywhere;
+}
+/* 0.925rem = 13.9px once the root font drops to 15px on phones; floor it at 15px.
+   Desktop stays 16.65px. */
+.pillarDesc {
+  font-size: max(0.925rem, 15px); color: var(--color-gray-500); line-height: 1.7; margin-bottom: 1.25rem;
+  overflow-wrap: anywhere;
+}
 
 /* Key Areas bullet list */
 .accordionWrapper {
@@ -142,7 +197,9 @@
 }
 .keyAreaItem {
   display: flex; align-items: flex-start; gap: 0.6rem;
-  font-size: 0.875rem; color: var(--color-gray-500); line-height: 1.55;
+  /* 0.875rem is 13.1px at the phone root — floored at 14px. Desktop stays 15.75px. */
+  font-size: max(0.875rem, 14px); color: var(--color-gray-500); line-height: 1.55;
+  overflow-wrap: anywhere; min-width: 0;
 }
 .keyAreaDot {
   flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%;
@@ -161,6 +218,70 @@
 .ctaText { font-size: 1.1rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 2.5rem; }
 .ctaActions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
+/* ── TOUCH ────────────────────────────────────────────────────
+   The pillar card is a hover-accordion: the description AND the key-areas list
+   both live inside .accordionWrapper, which is collapsed (0fr / opacity 0) until
+   :hover. On a touch device there is no hover, so every card showed nothing but
+   the TRACE letter and a one-line title — the entire body of the page was
+   unreachable. On any pointer that cannot hover, the accordion is simply open. */
+@media (hover: none) {
+  .accordionWrapper {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition: none;
+  }
+  .accordionInner {
+    transform: none;
+    transition: none;
+    /* no point promoting five cards to their own layers when nothing animates */
+    will-change: auto;
+  }
+  /* iOS keeps :hover latched on the last-tapped element, which would leave one
+     card permanently lifted with a teal border. Neutralise the hover skin. */
+  .pillarCard:hover {
+    transform: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    border-color: var(--color-gray-200, #eaeaea);
+  }
+  .pillarCard:hover .traceLetter { background: var(--color-primary); }
+}
+
 /* ── RESPONSIVE ───────────────────────────────────────────── */
-@media (max-width: 1024px) { .pillarsGrid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px)  { .pillarsGrid { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) {
+  .pillarsGrid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Give the hero copy the same gutter every other section gets. Only load-bearing
+     at <=780px (where the 780px box starts filling the viewport and the text would
+     otherwise touch both screen edges), but applied from 1024 down so there is no
+     width at which the hero is flush. Mirrors .container in globals.css, including
+     the notch guard for landscape. Symmetric, so RTL-safe. */
+  .heroInner {
+    padding-left: var(--container-pad);
+    padding-right: var(--container-pad);
+    padding-left: max(var(--container-pad), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--container-pad), env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (max-width: 768px) {
+  /* Was 600px. At 601–768px a 2-col track is only ~262px wide and the card's own
+     padding leaves ~205px of measure for the description and the bulleted key
+     areas — too narrow to read. Collapse to one column at the standard 768 step. */
+  .pillarsGrid { grid-template-columns: 1fr; }
+
+
+  /* Headings only wrap at these widths, and Arabic glyphs (Thmanyah Text) have far
+     more ascent/descent than Latin: at line-height 1.1/1.15 the second line's
+     ascenders collide with the first line's descenders. Latin is left as-is. */
+  [dir="rtl"] .heroTitle { line-height: 1.35; }
+  [dir="rtl"] .sectionTitle { line-height: 1.35; }
+}
+
+@media (max-width: 480px) {
+  /* 60vh + the flex centring leaves the hero copy floating in a tall empty band on
+     a phone, and the 2rem inner padding compounds it. */
+  .hero { min-height: 52vh; }
+  .heroInner { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+  .heroChip { margin-bottom: 1rem; letter-spacing: 0.12em; }
+  .traceLetter { width: 40px; height: 40px; font-size: 1.2rem; }
+}

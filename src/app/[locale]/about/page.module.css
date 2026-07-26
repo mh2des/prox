@@ -17,7 +17,14 @@
   margin: 0;
 }
 
-.page { overflow-x: hidden; }
+/* `clip`, NOT `hidden`. `overflow-x: hidden` forces overflow-y to compute to
+   `auto`, which turns .page into a real scroll container — and the nearest
+   scrollport is what `position: sticky` resolves against, so it silently
+   killed .whoLeft's sticky column at >=1025px. `clip` gives the same
+   overflow protection without ever creating a scrollport. Browsers without
+   `clip` support simply drop the declaration and fall back to the global
+   guard on <html>. */
+.page { overflow-x: clip; }
 
 /* ── Shared ─────────────────────────────────────────────────── */
 .sectionTitle {
@@ -28,7 +35,9 @@
   font-size: clamp(1.8rem,3.5vw,2.75rem); font-weight: 800;
   color: #fff; line-height: 1.15; margin-bottom: 0.5rem;
 }
-.centerHeader { text-align: center; max-width: 800px; margin: 0 auto 3.5rem; }
+/* 3.5rem = 63px at the desktop root; unchanged at >=1280px, but it no longer
+   leaves a 63px hole between a section title and its content on a phone. */
+.centerHeader { text-align: center; max-width: 800px; margin: 0 auto clamp(1.75rem, 5vw, 3.5rem); }
 .chipTeal {
   display: inline-block; background: rgba(19,144,136,0.12); color: var(--color-primary);
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
@@ -61,7 +70,6 @@
 .hero {
   position: relative; min-height: 62vh; display: flex; align-items: center;
   background-color: #0a1f1e;
-  background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=2000&q=80');
   background-size: cover; background-position: center; overflow: hidden;
 }
 .heroOverlay {
@@ -73,7 +81,10 @@
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
   background-size: 200% 100%; animation: shimmer 3s linear infinite;
 }
-.heroInner { position: relative; z-index: 2; max-width: 800px; padding: 2rem 0; }
+/* padding-block, not `padding` — the element also has the global `.container`
+   class, whose left/right gutter a shorthand would silently reset to 0,
+   pinning the hero copy to the very edge of the screen. */
+.heroInner { position: relative; z-index: 2; max-width: 800px; padding-block: 2rem; }
 .heroChip {
   display: inline-block; background: rgba(197,160,89,0.2); border: 1px solid rgba(197,160,89,0.4);
   color: var(--color-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em;
@@ -91,8 +102,15 @@
 }
 
 /* ── 2. WHO WE ARE ───────────────────────────────────────── */
-.who { padding: 7rem 0 4rem; background: #fff; }
+/* Both clamps hit their ceiling at exactly 1280px (10vw = 128 > 7rem = 126,
+   6vw = 76.8 > 4rem = 72), so the desktop rhythm is byte-identical and only
+   narrow viewports get the reduced band. */
+.who { padding: clamp(3rem, 10vw, 7rem) 0 clamp(2rem, 6vw, 4rem); background: #fff; }
 .whoGrid { display: grid; grid-template-columns: 320px 1fr; gap: 5rem; }
+/* Grid items default to min-width:auto, so one long unbroken word (a CMS
+   paragraph, a URL) would refuse to shrink and push the row wider than the
+   viewport. The children here are the ScrollReveal wrappers. */
+.whoGrid > * { min-width: 0; }
 .whoLeft { position: sticky; top: 120px; align-self: start; }
 .whoRight { display: flex; flex-direction: column; gap: 0.25rem; }
 .whoPara {
@@ -104,10 +122,14 @@
 .whoPara:last-of-type { border-bottom: none; }
 
 /* ── 3. VISION & MISSION ────────────────────────────────── */
-.vmv { padding: 4rem 0; background: var(--color-gray-50); }
+/* .vmv and .valuesSection sit back to back on the same grey background, so
+   their touching paddings stack: a flat 4rem + 4rem was 8rem (144px) of dead
+   grey between the split card and the "Our Values" heading — and still 120px
+   on a phone. Clamped, identical at >=1280px. */
+.vmv { padding: clamp(2rem, 6vw, 4rem) 0; background: var(--color-gray-50); }
 
 /* ── 4. OUR VALUES ──────────────────────────────────────── */
-.valuesSection { padding: 4rem 0 7rem; background: var(--color-gray-50); }
+.valuesSection { padding: clamp(2rem, 6vw, 4rem) 0 clamp(3rem, 10vw, 7rem); background: var(--color-gray-50); }
 .vmCard {
   border-radius: 16px; padding: 3rem 2.5rem;
   transition: transform 0.25s, box-shadow 0.25s; height: 100%;
@@ -239,6 +261,10 @@
   color: var(--color-secondary);
 }
 
+/* ── RESPONSIVE ──────────────────────────────────────────────
+   (The 1024px hub-grid block that used to live above this comment has been
+   merged in below — there were two separate @media (max-width: 1024px)
+   blocks in this file.) */
 @media (max-width: 1024px) {
   .hubGrid {
     grid-template-columns: 1fr;
@@ -246,15 +272,26 @@
     margin-left: auto;
     margin-right: auto;
   }
-}
 
-/* ── RESPONSIVE ──────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .whoGrid      { grid-template-columns: 1fr; }
+  /* .heroInner is `container` + this module class, and its `padding: 2rem 0`
+     shorthand cancels .container's horizontal gutter. That is harmless while
+     the viewport is far wider than the 800px cap, but from ~854px down the
+     hero copy runs flush against the screen edge. Restore the gutter here —
+     >=1025px is untouched. */
+  .heroInner    { padding-inline: var(--container-pad); }
+
+  .whoGrid      { grid-template-columns: 1fr; gap: 2.5rem; }
   .whoLeft      { position: static; }
   .vmGrid       { grid-template-columns: 1fr; }
   .leaderDetails{ grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .leaderTop    { flex-direction: column; }
+  /* 2rem below the rule + a 2.5rem stack gap read as one big empty band once
+     the two columns sit on top of each other. */
+  .goldBar      { margin: 1rem 0 1.25rem; }
+  .whoPara      { padding-bottom: 1rem; margin-bottom: 1rem; }
+}
+@media (max-width: 480px) {
+  .whoGrid      { gap: 1.75rem; }
 }

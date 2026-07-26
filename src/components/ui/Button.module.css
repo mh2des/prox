@@ -2,11 +2,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   border-radius: 4px;
   font-weight: 600;
+  /* Buttons must not inherit the 1.85 body leading — it made a single-line
+     button ~60px tall and a wrapped Arabic label enormous. */
+  line-height: 1.3;
   transition: all 0.2s ease;
   cursor: pointer;
   text-align: center;
+  /* Long Arabic labels ("طلب استشارة مجانية…") wrap inside the button instead
+     of pushing it wider than its parent and scrolling the page sideways. */
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 /* Variants */
@@ -67,6 +75,21 @@
 }
 
 .lg {
-  padding: 1rem 2rem;
+  /* The 2rem inline padding is the only part that can overflow a 320px
+     column; it keeps its desktop value and only tightens on small phones. */
+  padding: 1rem clamp(1.25rem, 5vw, 2rem);
   font-size: 1.125rem;
+}
+
+/* Touch: every button reaches the 44px minimum hit area on tablet and below.
+   (The fluid root font drops to 15px on phones, so rem padding alone no
+   longer guarantees a tappable height.) */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 44px;
+  }
+
+  .sm {
+    padding: 0.5rem 0.9rem;
+  }
 }

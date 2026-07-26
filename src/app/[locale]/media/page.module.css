@@ -6,7 +6,12 @@
 @keyframes heroFadeIn { from { opacity:0; } to { opacity:1; } }
 @keyframes shimmer    { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
 
-.page { overflow-x: hidden; }
+/* `clip` rather than `hidden`: when one axis is non-visible the other computes
+   to `auto`, so the old `overflow-x: hidden` silently turned this wrapper into
+   a vertical scroll container (breaking any sticky descendant and adding a
+   nested scrollport). `clip` never creates a scroll container; `hidden` stays
+   as the Safari < 16 fallback. */
+.page { overflow-x: hidden; overflow-x: clip; }
 
 /* ── Shared ───────────────────────────────────────────────── */
 .sectionTitle {
@@ -22,13 +27,14 @@
   width: 52px; height: 3px; background: var(--color-secondary);
   border-radius: 2px; margin: 1.25rem auto 0;
 }
-.sectionHeader { text-align: center; max-width: 720px; margin: 0 auto 3.5rem; }
+/* Bottom margin was a flat 3.5rem (63px desktop) and stayed ~53px on a phone.
+   4.93vw crosses 3.5rem at exactly 1280px, so desktop is unchanged. */
+.sectionHeader { text-align: center; max-width: 720px; margin: 0 auto clamp(2rem,4.93vw,3.5rem); }
 
 /* ── 1. HERO ──────────────────────────────────────────────── */
 .hero {
   position: relative; min-height: 58vh; display: flex; align-items: center;
   background-color: #0a1f1e;
-  background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=2000&q=80');
   background-size: cover; background-position: center; overflow: hidden;
 }
 .heroOverlay {
@@ -40,7 +46,11 @@
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
   background-size: 200% 100%; animation: shimmer 3s linear infinite;
 }
-.heroInner { position: relative; z-index: 2; max-width: 800px; padding: 2rem 0; }
+/* padding-block, not `padding` — the element also has the global `.container`
+   class, whose left/right gutter a shorthand would silently reset to 0,
+   pinning the hero copy to the very edge of the screen. Applies to both the
+   media list and the article detail page, which share this sheet. */
+.heroInner { position: relative; z-index: 2; max-width: 800px; padding-block: 2rem; }
 .heroChip {
   display: inline-block; background: rgba(197,160,89,0.2); border: 1px solid rgba(197,160,89,0.4);
   color: var(--color-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em;
@@ -57,77 +67,96 @@
 }
 
 /* ── 2. FEATURED ──────────────────────────────────────────── */
-.featured { padding: 6rem 0; background: #fff; }
+/* --section-y == 6rem@18px == 108px at >=1280px, so desktop is unchanged. */
+.featured { padding: var(--section-y) 0; background: #fff; }
 .featuredCard {
   display: grid; grid-template-columns: 1fr 1fr; gap: 0;
   border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.12);
 }
-.featuredImgWrap { position: relative; overflow: hidden; }
+/* min-width:0 — grid tracks default to min-width:auto, so one long unbroken
+   CMS word (URL, Arabic compound) would otherwise widen the whole card. */
+.featuredImgWrap { position: relative; overflow: hidden; min-width: 0; }
 .featuredImg { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
 .featuredCard:hover .featuredImg { transform: scale(1.04); }
 .featuredImgOverlay { position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, rgba(10,31,30,0.3)); }
+/* inset-inline-start (was `left`) so the badge sits on the leading edge in
+   Arabic too; offsets shrink on phones where 27px ate a fifth of the image. */
 .featuredBadge {
-  position: absolute; top: 1.5rem; left: 1.5rem;
+  position: absolute; top: clamp(0.75rem,2.11vw,1.5rem); inset-inline-start: clamp(0.75rem,2.11vw,1.5rem);
   background: var(--color-secondary); color: #fff;
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.35rem 0.9rem; border-radius: 100px;
+  padding: 0.35rem 0.9rem; border-radius: 100px; max-width: calc(100% - 1.5rem);
 }
+/* 3rem of padding (54px a side) left ~200px of text on a 320px screen.
+   4.3vw crosses 3rem at 1256px, so >=1280px still computes to exactly 54px. */
 .featuredContent {
-  background: var(--color-gray-50); padding: 3rem;
-  display: flex; flex-direction: column; justify-content: center;
+  background: var(--color-gray-50); padding: clamp(1.5rem,4.3vw,3rem);
+  display: flex; flex-direction: column; justify-content: center; min-width: 0;
 }
 .featuredMeta {
   display: flex; align-items: center; gap: 0.6rem;
   font-size: 0.8rem; color: var(--color-gray-500); margin-bottom: 1.25rem;
 }
 .metaDot { width: 6px; height: 6px; background: var(--color-secondary); border-radius: 50%; flex-shrink: 0; }
-.featuredTitle { font-size: clamp(1.3rem,2.5vw,1.8rem); font-weight: 800; color: var(--color-dark); line-height: 1.25; margin-bottom: 1rem; }
-.featuredExcerpt { font-size: 1rem; color: var(--color-gray-500); line-height: 1.75; margin-bottom: 2rem; }
+/* overflow-wrap:anywhere — title/excerpt are CMS fields and may contain a URL
+   or a long compound; `break-word` alone does not shrink the min-content size. */
+.featuredTitle { font-size: clamp(1.3rem,2.5vw,1.8rem); font-weight: 800; color: var(--color-dark); line-height: 1.25; margin-bottom: 1rem; overflow-wrap: anywhere; }
+.featuredExcerpt { font-size: 1rem; color: var(--color-gray-500); line-height: 1.75; margin-bottom: 2rem; overflow-wrap: anywhere; }
 .featuredBtn {
-  display: inline-flex; align-items: center; gap: 0.5rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
   background: var(--color-primary); color: #fff;
-  padding: 0.75rem 1.75rem; border-radius: 6px;
+  padding: 0.75rem clamp(1rem,4vw,1.75rem); border-radius: 6px;
   font-weight: 700; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.05em;
-  text-decoration: none; align-self: flex-start;
+  text-decoration: none; align-self: flex-start; max-width: 100%; text-align: center;
   transition: background 0.25s, transform 0.2s;
 }
+.featuredBtn svg { flex-shrink: 0; }
 .featuredBtn:hover { background: var(--color-primary-dark); transform: translateX(4px); color: #fff; }
 
 /* ── 3. ARTICLES GRID ─────────────────────────────────────── */
-.articles { padding: 6rem 0; background: var(--color-gray-50); }
-.articlesGrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
+.articles { padding: var(--section-y) 0; background: var(--color-gray-50); }
+/* --gap == 2rem@18px == 36px at >=1280px (identical); it steps down to 23px at
+   768 and 15px at 375 so two columns still leave a usable card width. */
+.articlesGrid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--gap); }
 .articleCard {
   background: #fff; border-radius: 14px; overflow: hidden;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   text-decoration: none; color: inherit;
   transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column;
+  min-width: 0; /* grid item: never let a long CMS title widen the track */
 }
 .articleCard:hover { transform: translateY(-8px); box-shadow: 0 12px 36px rgba(0,0,0,0.12); }
 .articleImgWrap { position: relative; overflow: hidden; aspect-ratio: 16/9; }
 .articleImg { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
 .articleCard:hover .articleImg { transform: scale(1.06); }
 .articleImgOverlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,31,30,0.4) 0%, transparent 60%); }
-.articleContent { padding: 1.75rem; flex: 1; display: flex; flex-direction: column; }
-.articleMeta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--color-gray-500); margin-bottom: 0.9rem; }
-.articleTitle { font-size: 1.05rem; font-weight: 700; color: var(--color-dark); line-height: 1.35; margin-bottom: 0.75rem; }
-.articleDesc { font-size: 0.9rem; color: var(--color-gray-500); line-height: 1.65; flex: 1; margin-bottom: 1.25rem; }
+/* 2.5vw crosses 1.75rem at 1260px -> desktop padding is still exactly 31.5px. */
+.articleContent { padding: clamp(1.25rem,2.5vw,1.75rem); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.articleMeta { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.78rem; color: var(--color-gray-500); margin-bottom: 0.9rem; }
+.articleTitle { font-size: 1.05rem; font-weight: 700; color: var(--color-dark); line-height: 1.35; margin-bottom: 0.75rem; overflow-wrap: anywhere; }
+.articleDesc { font-size: 0.9rem; color: var(--color-gray-500); line-height: 1.65; flex: 1; margin-bottom: 1.25rem; overflow-wrap: anywhere; }
 .articleReadMore {
   display: inline-flex; align-items: center; gap: 0.4rem;
   font-size: 0.82rem; font-weight: 700; color: var(--color-primary);
   text-transform: uppercase; letter-spacing: 0.06em; transition: gap 0.2s;
 }
+.articleReadMore svg { flex-shrink: 0; }
 .articleCard:hover .articleReadMore { gap: 0.7rem; }
 
 /* ── 4. NEWSLETTER ────────────────────────────────────────── */
-.newsletter { padding: 5rem 0; background: #0d2826; }
+/* 7.1vw crosses 5rem at 1268px -> still exactly 90px at >=1280px. */
+.newsletter { padding: clamp(2.5rem,7.1vw,5rem) 0; background: #0d2826; }
 .newsletterInner {
-  display: flex; align-items: center; justify-content: space-between; gap: 3rem; flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between; gap: clamp(1.75rem,4.3vw,3rem); flex-wrap: wrap;
 }
-.newsletterTitle { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
+.newsletterText { min-width: 0; }
+.newsletterTitle { font-size: clamp(1.35rem,2.3vw,1.6rem); font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
 .newsletterSub { color: rgba(255,255,255,0.65); font-size: 1rem; }
-.newsletterForm { display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: 280px; }
+/* min() so the 280px floor can never exceed the container at 320px. */
+.newsletterForm { display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; min-width: min(280px, 100%); }
 .newsletterInput {
-  flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  flex: 1; min-width: 0; /* inputs have an intrinsic min-width ~170px — clear it */
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
   color: #fff; padding: 0.85rem 1.25rem; border-radius: 6px; font-size: 0.95rem;
   outline: none; transition: border-color 0.25s;
 }
@@ -135,11 +164,114 @@
 .newsletterInput:focus { border-color: var(--color-secondary); }
 .newsletterBtn {
   background: var(--color-secondary); color: #fff;
-  padding: 0.85rem 2rem; border-radius: 6px;
+  padding: 0.85rem clamp(1.25rem,4vw,2rem); border-radius: 6px;
   font-weight: 700; font-size: 0.88rem; letter-spacing: 0.05em; text-transform: uppercase;
   cursor: pointer; border: none; transition: background 0.25s, transform 0.2s;
+  white-space: nowrap;
 }
 .newsletterBtn:hover { background: var(--color-secondary-dark); transform: translateY(-2px); }
+
+/* ============================================================
+   5. ARTICLE DETAIL  (media/[slug]/page.js imports this file)
+   The detail page previously styled itself with inline styles only, which
+   meant no media queries were possible and the CMS body had no prose rules
+   at all — globals.css resets every margin/padding to 0 and forces
+   `a { color: inherit; text-decoration: none }`, so paragraphs ran together,
+   list markers sat outside a zero-padding list, and links were invisible.
+   ============================================================ */
+/* 5.65vw crosses 4rem at 1274px -> exactly 72px of section padding at >=1280. */
+.articleSection { padding: clamp(2rem,5.65vw,4rem) 0; background: #fff; }
+/* Reading column. Descendant selector on purpose: it must beat .container's
+   max-width:1280px regardless of stylesheet order, since it replaces an inline
+   style that always won. */
+.page .articleWrap { max-width: 820px; margin-inline: auto; }
+
+.backLink {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--color-primary); text-decoration: none;
+  margin-bottom: clamp(1.5rem,3.52vw,2.5rem);
+}
+.backLink:hover { color: var(--color-primary-dark); }
+
+.articleHeroImg {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border-radius: clamp(10px,1.25vw,16px); overflow: hidden;
+  margin-bottom: clamp(1.5rem,3.52vw,2.5rem);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+}
+.articleMetaRow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem;
+  font-size: 0.85rem; color: var(--color-gray-500);
+  margin-bottom: clamp(1.25rem,2.82vw,2rem);
+}
+
+/* ── CMS rich text (TipTap HTML) ──────────────────────────────
+   Written defensively: the sanitizer's allow-list is p/br/strong/em/b/i/u/
+   h2/h3/ul/ol/li/blockquote/a today, but legacy or seeded rows may still
+   contain images, tables or <pre>, and none of them may widen the page. */
+.prose {
+  color: var(--color-gray-500);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote { margin-bottom: 1.25rem; }
+.prose > :last-child { margin-bottom: 0; }
+
+.prose h2 {
+  font-size: clamp(1.3rem,2.5vw,1.75rem); color: var(--color-dark);
+  margin-top: 2.25rem; margin-bottom: 0.75rem;
+}
+.prose h3 {
+  font-size: clamp(1.1rem,2vw,1.375rem); color: var(--color-dark);
+  margin-top: 1.75rem; margin-bottom: 0.6rem;
+}
+.prose > h2:first-child,
+.prose > h3:first-child { margin-top: 0; }
+
+/* Logical padding so the markers stay inside the column in Arabic too —
+   with the global `* { padding: 0 }` reset they were rendering outside it. */
+.prose ul,
+.prose ol { padding-inline-start: 1.5rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin-bottom: 0.4rem; }
+.prose li::marker { color: var(--color-secondary); }
+.prose li > ul,
+.prose li > ol { margin-top: 0.4rem; margin-bottom: 0; }
+
+.prose blockquote {
+  padding-inline-start: 1.25rem;
+  border-inline-start: 3px solid var(--color-secondary);
+  color: var(--color-dark); font-style: italic;
+}
+
+/* globals.css sets `a { color: inherit; text-decoration: none }`, which made
+   body links indistinguishable from surrounding text. */
+.prose a {
+  color: var(--color-primary); text-decoration: underline;
+  text-underline-offset: 0.18em; overflow-wrap: anywhere;
+}
+.prose a:hover { color: var(--color-primary-dark); }
+.prose strong,
+.prose b { color: var(--color-dark); font-weight: 700; }
+
+.prose img { display: block; max-width: 100%; height: auto; border-radius: 10px; margin: 1.5rem 0; }
+.prose figure { max-width: 100%; margin: 1.5rem 0; }
+.prose iframe,
+.prose video { max-width: 100%; }
+/* A wide table scrolls inside itself — never on the body. */
+.prose table { display: block; width: 100%; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.prose th,
+.prose td { padding: 0.5rem 0.75rem; border: 1px solid var(--color-gray-200); text-align: start; }
+.prose pre { max-width: 100%; overflow-x: auto; }
+.prose code { overflow-wrap: anywhere; }
+.prose hr { border: 0; border-top: 1px solid var(--color-gray-200); margin: 2rem 0; }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -149,7 +281,36 @@
   .featuredImgWrap { aspect-ratio: 16/9; }
   .articlesGrid { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 640px) {
+
+@media (max-width: 768px) {
+  /* The stack was previously left at align-items:center, so the form (flex:1,
+     min-width:280px) collapsed to ~314px and sat centred while the heading
+     stayed flush left — visibly misaligned. Stretch fixes both. */
+  .newsletterInner { flex-direction: column; align-items: stretch; }
+  .newsletterForm { flex: none; width: 100%; }
+  /* 44px tap target: plain <a> is excluded from the global floor. */
+  .backLink { min-height: 44px; }
+}
+
+@media (max-width: 600px) {
+  /* Was 640px — migrated onto the shared breakpoint scale. */
   .articlesGrid { grid-template-columns: 1fr; }
-  .newsletterInner { flex-direction: column; }
+  /* The fluid root bottoms out at 15px, so 1.05rem long-form body copy would
+     read at 15.75px. Nudge the article measure back to ~16.5px. */
+  .prose { font-size: 1.1rem; }
+  .prose blockquote { padding-inline-start: 1rem; }
+  .prose ul,
+  .prose ol { padding-inline-start: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  /* Side-by-side, the input keeps its ~170px intrinsic floor and the button
+     ~132px, so on a 320px screen the button wrapped onto its own half-width
+     line. Stacking gives both a full-width row. */
+  .newsletterForm { flex-direction: column; }
+  .newsletterBtn { width: 100%; }
+  /* 58vh reserved ~494px on a 852px-tall phone for ~350px of content, pushing
+     the featured article fully below the fold. */
+  .hero { min-height: 42vh; }
+  .heroInner { padding-block: 3rem; }
 }

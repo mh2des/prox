@@ -1,5 +1,8 @@
 .section {
-  padding: 6rem 0;
+  /* 6rem (108px) at >=1280px, exactly as before, then fluid all the way down
+     to 3rem on a 320px phone. Replaces the old fixed 6rem + a 4rem step at
+     768px, which left everything below 768px frozen at the same 4rem. */
+  padding: var(--section-y) 0;
 }
 
 .white {
@@ -22,8 +25,4 @@
   color: var(--color-white);
 }
 
-@media (max-width: 768px) {
-  .section {
-    padding: 4rem 0;
-  }
-}
+/* No max-width step-down needed: --section-y is already fluid at every width. */

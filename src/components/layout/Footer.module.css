@@ -6,6 +6,11 @@
 
 .footerTop {
   display: flex;
+  /* Last-resort escape hatch: the tagline is admin-editable (settings.companyDesc),
+     so a longer string than the default must push the nav onto its own line
+     rather than widen the row past the viewport. Never wraps at the shipped
+     content length, so >=1280px is unchanged. */
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1.5rem;
@@ -16,14 +21,28 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  /* Flex items default to min-width:auto, which would let a long CMS tagline
+     set an unshrinkable floor for this column. */
+  min-width: 0;
 }
 
 .logoLink {
   display: inline-block;
   text-decoration: none;
+  /* Blockified as a column flex item, so without this it stretches to the full
+     brand width and turns the empty space beside the logo into a home link. */
+  align-self: flex-start;
+  max-width: 100%;
 }
 
-.logoImg {
+/* Scoped under .logoLink deliberately — do NOT flatten this back to `.logoImg`.
+   The global media safety net in globals.css declares `height: auto` via
+   `img:not([data-nimg='fill'])`, an element + attribute selector with
+   specificity (0,1,1). A lone class is (0,1,0) and LOSES that cascade
+   regardless of source order, so `height: 70px` was being discarded and
+   next/image fell back to its intrinsic 90x90 box. The descendant selector
+   lifts this to (0,2,0) and the intended 70px height wins again. */
+.logoLink .logoImg {
   height: 70px;
   width: auto;
   object-fit: contain;
@@ -31,25 +50,41 @@
 }
 
 .tagline {
-  font-size: 0.8rem;
+  /* 0.8rem was 14.4px against the old fixed 18px root; the fluid root bottoms
+     out at 15px on phones, which would render this at 12px on a dark ground at
+     70% opacity. max() keeps the desktop size exact and sets a legibility floor. */
+  font-size: max(0.8rem, 13px);
   color: rgba(255, 255, 255, 0.7);
   font-weight: 400;
   letter-spacing: 0.01em;
+  /* CMS-authored. `anywhere` rather than the inherited `break-word` because only
+     `anywhere` also caps the min-content width, which is what actually stops an
+     unbroken string from widening the flex row. */
+  overflow-wrap: anywhere;
 }
 
 .nav {
   display: flex;
-  gap: 2.5rem;
+  /* Wrap the row instead of letting the links compress or overflow. */
+  flex-wrap: wrap;
+  /* 3.52vw hits the 2.5rem ceiling at exactly 1280px, so the desktop 45px gap
+     is preserved and only sub-desktop widths tighten (36px @1024, 27px @768). */
+  gap: 0.75rem clamp(1.5rem, 3.52vw, 2.5rem);
   align-items: center;
+  /* The brand column absorbs the shrink, not the nav. */
+  flex-shrink: 0;
 }
 
 .navLink {
-  font-size: 0.8rem;
+  font-size: max(0.8rem, 13px);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: color 0.2s ease;
+  /* Keep each label intact ("CONTACT US" must not break after "CONTACT");
+     .nav wraps between links instead. No label is wide enough to overflow. */
+  white-space: nowrap;
 }
 
 .navLink:hover {
@@ -65,8 +100,12 @@
 
 .footerBottom {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  /* Inert while the row fits (space-between already separates the two items);
+     only takes effect once the long copyright string forces a wrap. */
+  gap: 0.75rem;
   padding-top: 1.25rem;
 }
 
@@ -75,6 +114,9 @@
   transition: color 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* The 22px icon must never be squeezed by the long copyright beside it. */
+  flex-shrink: 0;
 }
 
 .social:hover {
@@ -82,20 +124,36 @@
 }
 
 .copyright {
-  font-size: 0.78rem;
+  font-size: max(0.78rem, 12.5px);
   color: rgba(255, 255, 255, 0.6);
+  min-width: 0;
 }
 
-/* RTL support */
-[dir="rtl"] .footerTop,
-[dir="rtl"] .footerBottom {
-  flex-direction: row-reverse;
+/* RTL support
+   ────────────────────────────────────────────────────────────────────────
+   This block used to force `flex-direction: row-reverse` on .footerTop,
+   .footerBottom and .nav. Both of those were wrong:
+
+   1. <html dir="rtl"> (layout.js:95) already flips the main axis of a
+      `flex-direction: row` container. row-reverse therefore double-reversed
+      it, so the Arabic footer rendered in English order — logo on the left,
+      and the nav reading "WHY PROEX" first from the LEFT instead of the right.
+   2. `[dir="rtl"] .footerTop` is specificity (0,2,0) and media queries add no
+      specificity, so it outranked the plain `.footerTop { flex-direction:
+      column }` (0,1,0) in the <=768px block below. The entire Arabic footer
+      silently refused to stack on phones and stayed as a squeezed row.
+
+   Deleting the overrides fixes both at once: `row` mirrors natively in RTL and
+   the mobile `column` now wins. Only genuinely direction-specific declarations
+   belong here — note that `align-items: flex-start` below is already logical
+   (it resolves to the right edge under dir="rtl"), so it needs no counterpart. */
+[dir="rtl"] .navLink,
+[dir="rtl"] .tagline {
+  /* Latin tracking pulls apart the joined letterforms of Arabic script. */
+  letter-spacing: normal;
 }
 
-[dir="rtl"] .nav {
-  flex-direction: row-reverse;
-}
-
+/* Tablet portrait and below — stack the two rows. */
 @media (max-width: 768px) {
   .footerTop {
     flex-direction: column;
@@ -106,16 +164,52 @@
   .nav {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    /* Small gap on purpose: the 44px min-height below supplies the visual
+       separation, so 1rem here would read as a huge gutter. */
+    gap: 0.25rem;
+  }
+
+  .navLink {
+    /* Plain <a> is deliberately excluded from the global 44px tap-target floor
+       in globals.css, so nav links have to opt in — they were ~26px tall. */
+    display: flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   .footerBottom {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .social {
+    /* Was a 22px x 22px hit area. */
+    min-width: 44px;
+    min-height: 44px;
+    /* The icon is centred in a 44px box, so it would otherwise sit 11px further
+       in than the copyright line beneath it. Logical property, so it pulls the
+       correct way in Arabic. */
+    margin-inline-start: -11px;
   }
 
   .divider {
     width: 100%;
+  }
+}
+
+/* Phones — reclaim vertical space; the stack above is tall by construction. */
+@media (max-width: 480px) {
+  .footer {
+    padding: 2rem 0 1.25rem;
+  }
+
+  .footerTop {
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .logoLink .logoImg {
+    height: 58px;
   }
 }

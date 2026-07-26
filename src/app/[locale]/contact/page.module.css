@@ -3,10 +3,15 @@
    ───────────────────────────────────────────────────────────── */
 
 /* ── MAP SECTION ──────────────────────────────────────────── */
+/* min-height, not height. The section is `overflow: hidden`, so a fixed height
+   silently CLIPS the office list once there are enough offices (or once the
+   Arabic address lines wrap further than the English ones). min-height keeps
+   the 540px desktop proportion identical while letting the box grow instead of
+   swallowing content. */
 .mapSection {
   position: relative;
   width: 100%;
-  height: 540px;
+  min-height: 540px;
   overflow: hidden;
   background-color: #102e2e;
   display: flex;
@@ -133,7 +138,9 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  padding-right: 2rem; /* Add some padding so it doesn't hug the edge */
+  /* Logical, not padding-right: in Arabic the column sits on the opposite side
+     and a physical right-pad would push it away from the wrong edge. */
+  padding-inline-end: 2rem;
   pointer-events: auto;
 }
 
@@ -157,6 +164,9 @@
   color: #ffffff;
   line-height: 1.5;
   margin: 0;
+  /* Office emails are single unbreakable tokens; without this they widen the
+     grid track and push the page into horizontal scroll on a 320px phone. */
+  overflow-wrap: anywhere;
 }
 
 /* ── FORM SECTION ─────────────────────────────────────────── */
@@ -247,19 +257,11 @@ textarea.input {
   transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
-  .mapSection   { height: auto; min-height: 360px; }
-  .officeCards  { flex-direction: column; position: static; transform: none; padding: 1.5rem; }
-  .formRow      { grid-template-columns: 1fr; }
-  .ctaActions   { flex-direction: column; align-items: stretch; }
-}
-
 /* ── CTA BANNER ───────────────────────────────────────────── */
 .cta {
   position: relative;
   padding: 8rem 0;
   background-color: #091a19;
-  background-image: url('https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=2000&q=80');
   background-size: cover;
   background-position: center;
   text-align: center;
@@ -343,4 +345,80 @@ textarea.input {
   border-color: var(--color-secondary, #c5a059);
   color: var(--color-secondary, #c5a059);
   transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   Placed at the end of the file on purpose. These are desktop-first
+   max-width queries at equal specificity, so source order decides the
+   winner: they must come after every base rule they override, and be
+   ordered widest-first so a narrower query can refine a wider one.
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* The office column was a hard 400px track. Narrow it before the stack so
+     the map still has room to read as a map. */
+  .mapInner    { grid-template-columns: 1fr 340px; }
+  .mapSection  { min-height: 480px; }
+  .cta         { padding: 6rem 0; }
+}
+
+@media (max-width: 768px) {
+  /* CRITICAL: the 400px track never collapsed. Below ~466px it alone exceeded
+     the viewport and forced horizontal scroll on the whole page. Single column
+     from here down; the section height now comes from its content. */
+  .mapInner {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-block: 3.5rem;
+  }
+
+  .mapSection { min-height: 0; }
+
+  .officeTextList {
+    padding-inline-end: 0;
+    gap: 2rem;
+  }
+
+  /* The desktop overlay is a 90deg gradient that only goes dark on the side the
+     text column sits on. Once the text spans the full width it lands on the
+     light end of that gradient and becomes unreadable — swap to a flat scrim. */
+  .mapOverlay {
+    background: linear-gradient(180deg, rgba(16, 46, 46, 0.72) 0%, rgba(16, 46, 46, 0.9) 100%);
+  }
+
+  .formRow     { grid-template-columns: 1fr; }
+  .formSection { padding: 3.5rem 0 4rem; }
+  .formTitle   { margin-bottom: 2rem; }
+
+  /* Right-aligned submit reads as an orphan on a narrow column. */
+  .submitRow   { margin-top: 2rem; }
+  .submitBtn   { width: 100%; }
+
+  .cta         { padding: 4.5rem 0; }
+  .ctaActions  { flex-direction: column; align-items: stretch; }
+
+  /* inline-block buttons stretched by align-items need their label re-centered. */
+  .btnGold,
+  .btnCtaOutline { text-align: center; }
+}
+
+@media (max-width: 600px) {
+  .officeNameText { font-size: 1.15rem; }
+  .ctaText        { font-size: 1.05rem; margin-bottom: 2rem; }
+}
+
+@media (max-width: 480px) {
+  .mapInner       { padding-block: 2.5rem; }
+  .officeTextList { gap: 1.75rem; }
+  .formSection    { padding: 2.75rem 0 3.25rem; }
+  .cta            { padding: 3.5rem 0; }
+  .ctaGoldLine    { margin-bottom: 1.5rem; }
+}
+
+@media (max-width: 380px) {
+  /* Uppercase + 0.05em tracking on a long office name is the last thing that
+     can still overrun a 320px screen. */
+  .officeNameText { font-size: 1.05rem; letter-spacing: 0.03em; }
+  .officeLineText { font-size: 0.95rem; }
 }

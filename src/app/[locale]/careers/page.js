@@ -3,6 +3,7 @@ import { getTranslations } from '../../../lib/i18n';
 import { getPage } from '../../../lib/content';
 import CareersClient from './CareersClient';
 import TabBar from './TabBar';
+import BackdropImage from '../../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -23,6 +24,11 @@ export default async function Careers({ params: { locale } }) {
         id="careers-hero"
         style={page?.heroImageUrl ? { backgroundImage: `url(${page.heroImageUrl})` } : undefined}
       >
+        {/* Above the fold: preloaded as this page's LCP candidate. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           <h1 className={styles.heroTitle}>{page?.heroTitle || c.heroTitle}</h1>

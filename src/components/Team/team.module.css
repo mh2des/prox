@@ -206,8 +206,14 @@
   border-radius: 16px;
   max-width: 900px;
   width: 100%;
+  /* dvh so the modal cannot exceed the *visible* viewport on mobile browsers,
+     where vh ignores the address bar and would push the bottom of the bio
+     (and any action under it) off-screen with no way to reach it. */
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  /* Momentum scrolling inside the modal must not chain to the page behind it. */
+  overscroll-behavior: contain;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -217,7 +223,9 @@
 .modalCloseBtn {
   position: absolute;
   top: 1.5rem;
-  right: 1.5rem;
+  /* The modal sets dir="rtl" for Arabic, so a physical `right` would park the
+     close button on top of the portrait instead of the far corner. */
+  inset-inline-end: 1.5rem;
   background: rgba(0,0,0,0.05);
   border: none;
   width: 36px;
@@ -302,28 +310,59 @@
 .expRole { font-size: 0.95rem; font-weight: 700; color: #0d2826; margin: 0 0 0.35rem; }
 .expDesc { font-size: 0.88rem; color: #718096; line-height: 1.6; margin: 0; }
 
-/* ── Fallback / Mobile Container Break ── */
-@media (max-width: 900px) {
+/* ── RESPONSIVE ────────────────────────────────────────────────────────
+   Widest-first. Note: .teamContainer / .teamMemberWrapper / .pos0-.pos4 style
+   TeamSection + TeamMember, which no page currently renders — the live
+   consumer of this sheet is TeamDetailModal, opened from InteractiveTeam.
+   Those rules are left intact but the modal is what was actually verified.
+   ──────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
   .teamContainer {
     flex-wrap: wrap;
     gap: 3rem;
   }
-  
+
   .teamMemberWrapper {
     margin: 0 !important; /* Stop overlapping */
   }
 
   /* Reset borders & sizes for grid */
-  .pos0 .profileImageContainer, .pos1 .profileImageContainer, 
-  .pos2 .profileImageContainer, .pos3 .profileImageContainer, 
+  .pos0 .profileImageContainer, .pos1 .profileImageContainer,
+  .pos2 .profileImageContainer, .pos3 .profileImageContainer,
   .pos4 .profileImageContainer {
     width: 160px;
     height: 160px;
     border-width: 4px;
   }
-  
+
   .modalHeader { flex-direction: column; text-align: center; gap: 1rem; }
   .modalGrid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  /* 2rem of overlay padding on each side eats 60px of a 320px screen. */
+  .modalOverlay { padding: 1.25rem; }
+  /* Top padding is 3.5rem rather than 2rem to clear the enlarged close button
+     below — without it a long name runs underneath the button. */
+  .modalHeader  { padding: 3.5rem 1.5rem 1.25rem; }
+  .modalBody    { padding: 1.75rem 1.5rem; }
+  .modalBio     { font-size: 1rem; margin-bottom: 2rem; }
+  .modalName    { font-size: 1.5rem; }
+
+  /* Sub-44px hit area, and it sits over scrolling content — the easiest
+     control in the whole modal to miss on a phone. */
+  .modalCloseBtn {
+    width: 44px;
+    height: 44px;
+    top: 1rem;
+    inset-inline-end: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .modalImgWrap { width: 120px; height: 120px; }
+  .modalGrid    { gap: 1.75rem; }
+  .expList      { gap: 1.25rem; }
 }
 
 @media (max-width: 480px) {
@@ -331,4 +370,17 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .modalOverlay { padding: 0.75rem; }
+  .modalHeader  { padding: 3.25rem 1.15rem 1rem; }
+  .modalBody    { padding: 1.5rem 1.15rem; }
+  .modalImgWrap { width: 104px; height: 104px; }
+  .modalName    { font-size: 1.3rem; }
+  .modalBio     { font-size: 0.95rem; }
+}
+
+@media (max-width: 380px) {
+  .modalOverlay  { padding: 0.5rem; }
+  .modalColTitle { letter-spacing: 0.08em; }
+  .modalImgWrap  { width: 92px; height: 92px; }
 }

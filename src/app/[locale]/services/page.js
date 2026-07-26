@@ -1,6 +1,7 @@
 import styles from './page.module.css';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
 import { getPage, getPillars } from '../../../lib/content';
+import BackdropImage from '../../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -28,11 +29,18 @@ export default async function Services({ params: { locale } }) {
 
       {/* ── 1. HERO ─────────────────────────────────────────── */}
       <section className={styles.hero}>
+        {/* Above the fold: preloaded as this page's LCP candidate. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1568992687947-868a62a9f521?auto=format&fit=crop&w=2000&q=80"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           {page?.heroBadge && <div className={styles.heroChip}>{page.heroBadge}</div>}
           <h1 className={styles.heroTitle}>{page?.heroTitle || (isAr ? 'خدماتنا' : 'Our Services')}</h1>
-          <p className={styles.heroSubtitle}>{page?.heroSubtitle}</p>
+          {/* guard: an absent subtitle still rendered an empty <p>, i.e. ~31px of dead
+              space inside a hero that is already vertically tight on a phone */}
+          {page?.heroSubtitle && <p className={styles.heroSubtitle}>{page.heroSubtitle}</p>}
         </div>
         <div className={styles.heroBar} />
       </section>

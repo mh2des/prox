@@ -43,7 +43,6 @@
 .hero {
   position: relative; min-height: 65vh; display: flex; align-items: center;
   background-color: #0a1f1e;
-  background-image: url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80');
   background-size: cover; background-position: center;
   overflow: hidden; /* only clip the hero, not the whole page */
 }
@@ -56,7 +55,12 @@
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
   background-size: 200% 100%; animation: shimmer 3s linear infinite;
 }
-.heroInner { position: relative; z-index: 2; max-width: 700px; padding: 3rem 0 5rem; }
+/* padding-block, NOT the `padding` shorthand. This element also carries the
+   global `.container` class, which supplies the page gutter via
+   padding-left/padding-right. A shorthand here resets those longhands to 0 at
+   equal specificity, and the hero text ends up flush against the screen edge
+   with no margin at all — the narrower the phone, the worse it looks. */
+.heroInner { position: relative; z-index: 2; max-width: 700px; padding-block: 3rem 5rem; }
 .heroChip {
   display: inline-block; background: rgba(197,160,89,0.2); border: 1px solid rgba(197,160,89,0.4);
   color: var(--color-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.18em;
@@ -104,7 +108,10 @@
 /* ── STICKY TAB BAR ────────────────────────────────────────── */
 .tabBar {
   position: sticky;
-  top: 75px; /* Exact height of the sticky main header */
+  /* Was a hardcoded 75px. The header is no longer a fixed height — its logo
+     scales with the viewport — so a literal offset leaves a white gap on
+     desktop and lets the bar slide under the header on mobile. */
+  top: var(--header-h, 75px);
   z-index: 900;
   background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
@@ -114,7 +121,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* Four uppercase tabs with 0.1em tracking cannot fit a phone. They scroll
+     inside this bar rather than widening the page — but `space-between` only
+     distributes leftover space, so once the tabs overflow they butt together
+     with no separation. The gap is what keeps them legible while scrolled. */
+  gap: 1.5rem;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
   scrollbar-width: none;
 }
 .tabList::-webkit-scrollbar { display: none; }
@@ -210,7 +223,10 @@
   min-height: 420px;
 }
 .splitText {
-  padding: 5rem 4rem 5rem 0;
+  /* Logical equivalent of `5rem 4rem 5rem 0` — in Arabic the gutter has to sit
+     on the other side of the text or it collides with the image. */
+  padding-block: 5rem;
+  padding-inline: 0 4rem;
   display: flex; flex-direction: column; justify-content: center;
   max-width: 100%;
 }
@@ -239,12 +255,16 @@
 }
 .splitImg:hover img { transform: scale(1.03); }
 
-/* Reversed: image LEFT, text RIGHT */
-.splitGridReverse { direction: rtl; }
-.splitGridReverse > * { direction: ltr; }
-/* Right-side text: pad left instead of right */
-.splitGridReverse .splitText,
-.splitTextRight { padding: 5rem 0 5rem 4rem; }
+/* Reversed variant (image first, text second) is done in the markup by DOM
+   order — CareersClient renders .splitImg before .splitText.splitTextRight.
+   The old `.splitGridReverse { direction: rtl }` class is not used by any JSX;
+   it is left out deliberately rather than resurrected, because forcing
+   `direction` to flip a grid also flips the text direction of its children,
+   which would have rendered the Arabic copy left-to-right. */
+.splitTextRight {
+  padding-block: 5rem;
+  padding-inline: 4rem 0;
+}
 
 
 .emailCta {
@@ -419,16 +439,110 @@
   border-radius: 2px;
 }
 
-/* ── RESPONSIVE ───────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .splitGrid { grid-template-columns: 1fr; }
+/* ── RESPONSIVE ───────────────────────────────────────────────────────
+   Widest-first. Equal-specificity max-width queries resolve by source order,
+   so a narrower block must come after the wider one it refines.
+   ───────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* Was 900px — moved onto the shared scale. 1fr/1fr with a 420px min-height
+     squeezes the text column below a comfortable measure well before 900px. */
+  .splitGrid { grid-template-columns: 1fr; min-height: 0; }
+  /* Shorthand deliberately: it resets the padding-block/padding-inline
+     longhands on BOTH .splitText and .splitText.splitTextRight in one rule,
+     and it is horizontally symmetric so it stays correct in Arabic. */
   .splitText { padding: 3rem 2rem; }
-  .splitImg { min-height: 280px; }
+  .splitImg  { min-height: 280px; }
+  .tabSection .splitGrid { padding: 0 1.5rem; }
 }
+
 @media (max-width: 768px) {
   .tabList { padding-bottom: 0.25rem; }
-  .jobTabs { flex-direction: column; align-items: center; }
-  .jobTab { width: 100%; min-width: 0; max-width: 300px; }
-  .jobFilters { flex-direction: column; align-items: stretch; gap: 1rem; }
-  .filterBtn { height: 50px; }
+
+  /* The four tabs cannot fit an English phone layout ("LIFE AT PROEX /
+     ENGAGEMENT / UPSKILLING & GROWTH / JOB OPPORTUNITIES" is ~600px of
+     uppercase tracked text). They scroll — but `space-between` distributes
+     leftover space only, so as soon as they overflow the boxed last tab was
+     left sliced in half at the edge with nothing signalling it could scroll.
+     Pack them from the start edge and let the strip run past the container
+     gutter, so a partly-visible tab reads as "there is more this way". */
+  .tabList {
+    justify-content: flex-start;
+    gap: 1.5rem;
+    scroll-snap-type: inline proximity;
+    /* Cancel the .container gutter for the scrollport, then re-apply it as
+       scroll padding so the first and last tabs still align with the page. */
+    margin-inline: calc(var(--container-pad) * -1);
+    padding-inline: var(--container-pad);
+    scroll-padding-inline: var(--container-pad);
+  }
+  .tabBtn { font-size: 0.72rem; letter-spacing: 0.08em; scroll-snap-align: start; }
+
+  /* Drop the outlined-box treatment on the last tab for phones. Even scrolled,
+     the four labels need ~590px against a 428px strip, so something is always
+     partly off-edge — and a BOX cut through the middle of its border reads as
+     a rendering fault, while a clipped word reads as "scroll for more". */
+  .tabBtnLast {
+    padding: 1.25rem 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    color: var(--color-primary);
+  }
+  .tabBtnLast.tabBtnActive { border: none; }
+
+  /* Fade the trailing edge so the cut-off tab is legibly "more content",
+     not a glitch. Direction-aware: `to right` in LTR, mirrored for Arabic. */
+  .tabBar {
+    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+  }
+  [dir='rtl'] .tabBar {
+    -webkit-mask-image: linear-gradient(to left, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 88%, transparent 100%);
+  }
+
+  .tabSection   { padding: 3.5rem 0; }
+  .splitText    { padding: 2.5rem 1.25rem; }
+  .splitImg     { min-height: 220px; }
+  .tabSection .splitGrid { padding: 0; }
+
+  /* Justified text needs a wide measure. On a phone column it opens rivers of
+     whitespace between words — badly in Arabic, where the shaper stretches
+     glyphs to fill. Left/right-align by reading direction instead. */
+  .splitBody    { text-align: start; }
+
+  .heroInner    { padding-block: 2.5rem 3.5rem; }
+
+  .jobTabs      { flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 3rem; }
+  .jobTab       { width: 100%; min-width: 0; max-width: 300px; }
+  .jobFilters   { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .filterBtn    { height: 50px; }
+  .noJobsMessage { padding: 3rem 1.5rem; }
+  .centerHeaderContainer { margin-bottom: 2.5rem; }
+}
+
+@media (max-width: 600px) {
+  /* 65vh is measured against the largest viewport (URL bar retracted), so on
+     mobile Safari the hero is taller than the screen on load and the tab bar
+     is pushed out of sight. dvh tracks the visible viewport. */
+  .hero        { min-height: 65dvh; }
+  .splitTitle  { margin-bottom: 0; }
+  .centerGoldBar { width: min(250px, 70%); }
+}
+
+@media (max-width: 480px) {
+  .tabSection  { padding: 2.75rem 0; }
+  .splitText   { padding: 2rem 1rem; }
+  .splitImg    { min-height: 190px; }
+  .heroInner   { padding-block: 2rem 2.75rem; }
+  .noJobsMessage { padding: 2.5rem 1.25rem; font-size: 1rem; }
+  .upskillItem { font-size: 0.9rem; }
+}
+
+@media (max-width: 380px) {
+  .tabBtn      { font-size: 0.68rem; letter-spacing: 0.06em; }
+  .tabBtnLast  { padding: 0.6rem 0.9rem; }
+  .tabList     { gap: 1rem; }
+  .filterBtn   { padding: 0 1.5rem; }
 }

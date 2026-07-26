@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import styles from '../page.module.css';
 import { getPost } from '../../../../lib/content';
 import { prisma } from '../../../../lib/prisma';
+import BackdropImage from '../../../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -47,6 +48,11 @@ export default async function ArticleDetail({ params: { locale, slug } }) {
 
       {/* ── HERO ─────────────────────────────────────────── */}
       <section className={styles.hero}>
+        {/* Above the fold: preloaded as this page's LCP candidate. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=2000&q=80"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           {date && <div className={styles.heroChip}>{date}</div>}
@@ -57,73 +63,38 @@ export default async function ArticleDetail({ params: { locale, slug } }) {
       </section>
 
       {/* ── ARTICLE BODY ─────────────────────────────────── */}
-      <section style={{ padding: '4rem 0', background: '#fff' }}>
-        <div
-          className="container"
-          style={{ maxWidth: '820px', marginInline: 'auto' }}
-        >
-          <Link
-            href={`/${locale}/media`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: 'var(--color-primary)',
-              textDecoration: 'none',
-              marginBottom: '2.5rem',
-            }}
-          >
+      {/* Styling lives in ../page.module.css (.articleSection / .articleWrap /
+          .backLink / .articleHeroImg / .articleMetaRow / .prose) rather than in
+          inline styles, so it can respond to viewport width — inline styles
+          cannot carry media queries, and the CMS body needs prose rules that
+          globals.css deliberately resets away. */}
+      <section className={styles.articleSection}>
+        <div className={`container ${styles.articleWrap}`}>
+          <Link href={`/${locale}/media`} className={styles.backLink}>
             {isAr ? '→' : '←'} {backLabel}
           </Link>
 
           {post.featuredImage && (
-            <div
-              style={{
-                position: 'relative',
-                width: '100%',
-                aspectRatio: '16 / 9',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                marginBottom: '2.5rem',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
-              }}
-            >
+            <div className={styles.articleHeroImg}>
               <Image
                 src={post.featuredImage}
                 alt={post.title || ''}
                 fill
-                sizes="(max-width: 820px) 100vw, 820px"
+                sizes="(max-width: 768px) 100vw, 768px"
                 style={{ objectFit: 'cover' }}
               />
             </div>
           )}
 
           {metaParts.length > 0 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem',
-                fontSize: '0.85rem',
-                color: 'var(--color-gray-500)',
-                marginBottom: '2rem',
-              }}
-            >
+            <div className={styles.articleMetaRow}>
               <span className={styles.metaDot} />
-              {metaParts.join(isAr ? ' · ' : ' · ')}
+              {metaParts.join(' · ')}
             </div>
           )}
 
           <article
-            style={{
-              color: 'var(--color-gray-500)',
-              fontSize: '1.05rem',
-              lineHeight: 1.85,
-            }}
+            className={styles.prose}
             dangerouslySetInnerHTML={{ __html: post.content || '' }}
           />
         </div>

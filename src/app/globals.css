@@ -1,40 +1,126 @@
 /* ── Thmanyah Text (ثمانية للنصوص — the "للنصوص" text cut, font.thmanyah.com) ──
-   Self-hosted, five weights (Light/Regular/Medium/Bold/Black). This is the
-   site's primary face end-to-end; Latin falls back to system-ui. */
+   Self-hosted, five weights (Light/Regular/Medium/Bold/Black), each split into
+   a Latin and an Arabic cut and selected with `unicode-range`.
+
+   The single combined files carried all 416 codepoints — 203 Latin AND 183
+   Arabic, plus the full Arabic shaping tables — in every weight, so an English
+   reader downloaded the entire Arabic face and an Arabic reader downloaded the
+   entire Latin one. At 73-79 KB per weight that made fonts 312 KB of a 452 KB
+   page: 69% of everything the browser fetched, and on the critical path for
+   text.
+
+   Split, a weight is 13 KB of Latin or ~50 KB of Arabic, and `unicode-range`
+   means the browser only ever requests the cut whose characters actually
+   appear on the page. English pages: 312 KB -> ~52 KB.
+
+   The Arabic files intentionally also contain space, digits and basic
+   punctuation so Arabic runs shape correctly, but their unicode-range claims
+   only the Arabic blocks — the range controls WHEN a file is fetched, the
+   glyphs inside control whether it renders correctly once it is. */
+
 @font-face {
   font-family: 'Thmanyah Text';
-  src: url('/fonts/thmanyah-text-light.woff2') format('woff2');
+  src: url('/fonts/thmanyah-light-latin.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
 @font-face {
   font-family: 'Thmanyah Text';
-  src: url('/fonts/thmanyah-text-regular.woff2') format('woff2');
+  src: url('/fonts/thmanyah-light-arabic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF,
+    U+200C-200F, U+2010-2011, U+204F, U+2E41;
+}
+
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-regular-latin.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
 @font-face {
   font-family: 'Thmanyah Text';
-  src: url('/fonts/thmanyah-text-medium.woff2') format('woff2');
+  src: url('/fonts/thmanyah-regular-arabic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF,
+    U+200C-200F, U+2010-2011, U+204F, U+2E41;
+}
+
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-medium-latin.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
 @font-face {
   font-family: 'Thmanyah Text';
-  src: url('/fonts/thmanyah-text-bold.woff2') format('woff2');
+  src: url('/fonts/thmanyah-medium-arabic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF,
+    U+200C-200F, U+2010-2011, U+204F, U+2E41;
+}
+
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-bold-latin.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
 @font-face {
   font-family: 'Thmanyah Text';
-  src: url('/fonts/thmanyah-text-black.woff2') format('woff2');
+  src: url('/fonts/thmanyah-bold-arabic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF,
+    U+200C-200F, U+2010-2011, U+204F, U+2E41;
+}
+
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-black-latin.woff2') format('woff2');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Thmanyah Text';
+  src: url('/fonts/thmanyah-black-arabic.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF,
+    U+200C-200F, U+2010-2011, U+204F, U+2E41;
 }
 
 :root {
@@ -61,7 +147,31 @@
   
   /* Constraints */
   --max-width: 1280px;
-  
+
+  /* ── Fluid layout scale ──────────────────────────────────────────────
+     Consumed by .container, the Section primitive, and page modules.
+     Every token clamps to its original desktop value at >=1280px so the
+     full-width design is byte-for-byte unchanged, then steps down on
+     narrow viewports instead of staying frozen at the desktop size.
+     Measured (px), root font = the fluid scale below:
+                        1280   1024    768    375
+       --container-pad    27     27     24     15   (was a flat 27)
+       --section-y       108     87     65     45   (was a flat 108 / 64)
+       --gap              36     31     23     15   (new) */
+  --container-pad: clamp(1rem, 4vw, 1.5rem);
+  --section-y: clamp(3rem, 8.5vw, 6rem);
+  --gap: clamp(1rem, 3vw, 2rem);
+
+  /* ── Live sticky-header height ───────────────────────────────────────
+     The header's own vertical padding (0.9rem top + bottom) plus whichever
+     of the logo or the 44px hamburger target is taller. Defined on :root,
+     not on .header, because elements OUTSIDE the header subtree need it —
+     the careers page pins its own tab bar directly below the header, and a
+     hardcoded offset there desyncs the moment the logo starts scaling.
+     Keep in sync with .logoImg's clamp in Header.module.css.
+       >=1280px -> 87px      1024px -> 78px      <=615px -> 76px  */
+  --header-h: calc(1.8rem + max(clamp(40px, 6.5vw, 55px), 44px));
+
   /* Fonts — Thmanyah type system: one serif family, headings in the bold cut */
   --font-primary: 'Thmanyah Text', system-ui, -apple-system, sans-serif; /* body / text */
   --font-display: 'Thmanyah Text', system-ui, serif;                     /* headings (bold) */
@@ -79,15 +189,53 @@
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: clip;
+  /* 100% — NOT 100vw. On desktops with classic (space-taking) scrollbars,
+     100vw includes the scrollbar width, so `max-width: 100vw` lets the page
+     be ~15px wider than the visible content area and produces a phantom
+     horizontal scrollbar all by itself. 100% resolves against the viewport's
+     content box, which is what we actually want. */
+  max-width: 100%;
   scroll-behavior: smooth;
 }
 
-/* Bump the root so every rem-based size (fonts AND spacing) grows together —
-   a bigger, airier feel that suits the Thmanyah serif. */
+/* Horizontal-overflow guard — declared on <html> ONLY, deliberately.
+   Overflow set on the root element propagates to the viewport, and the root's
+   own used value then becomes `visible`, so <html> never turns into a scroll
+   container. Because the root is no longer `visible`, a second declaration on
+   <body> would NOT propagate — it would apply to <body> itself and make it a
+   real scroll container, which silently kills every `position: sticky`
+   descendant (the site Header, .whoLeft on /about, the careers TabBar).
+   That is exactly what the previous `html, body { overflow-x: clip }` did.
+   `clip` is preferred (it never creates a scroll container); `hidden` is the
+   fallback for Safari < 16 / older browsers that don't support `clip`. */
 html {
-  font-size: 18px;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+body {
+  /* Do NOT set overflow-x here — see the note on <html> above. Sticky
+     positioning depends on <body> staying `visible`. */
+  overflow-x: visible;
+}
+
+/* Fluid root size. The whole site is sized in rem, so this scales every font,
+   padding, and gap together — the original intent (a bigger, airier feel that
+   suits the Thmanyah serif) is preserved at desktop, but no longer forces the
+   desktop scale onto a 360px phone where it read cramped and overflowed.
+     Curve: 13px + 0.4vw, clamped between 15px and 18px.
+     (Written in rem so a user's own browser font-size preference still scales
+      it; inside the root's own font-size declaration, 1rem = the initial 16px,
+      so 0.9375rem = 15px, 0.8125rem = 13px, 1.125rem = 18px.)
+       >= 1280px -> 18.00px  (max — identical to the previous fixed 18px, so
+                              1920 / 1440 / 1280 render pixel-for-pixel as before)
+          1200px -> 17.80px
+          1024px -> 17.10px
+           834px -> 16.34px
+           768px -> 16.07px
+        <= 500px -> 15.00px  (min — 480 / 430 / 393 / 375 / 360 / 320 all 15px) */
+html {
+  font-size: clamp(0.9375rem, 0.8125rem + 0.4vw, 1.125rem);
 }
 
 body {
@@ -106,6 +254,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.85;
+  /* Long unbreakable strings (emails, URLs, CMS-pasted tokens) must break
+     rather than push their container wider than the viewport. Inherited, so
+     this covers every descendant unless a component opts out. */
+  overflow-wrap: break-word;
+}
+
+/* The 1.85 body leading is tuned for desktop measure; on a phone the same
+   value wastes vertical space and makes short paragraphs feel disconnected. */
+@media (max-width: 600px) {
+  body {
+    line-height: 1.7;
+  }
 }
 
 /* Headings: display face, and route family via zero-specificity :where so page
@@ -122,6 +282,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
   letter-spacing: -0.01em;
   line-height: 1.3 !important;
+  /* A single long word in a heading (Arabic compounds, product names) must
+     not be able to widen the page at 320px. */
+  overflow-wrap: break-word;
 }
 
 * {
@@ -158,8 +321,90 @@ h1, h2, h3, h4, h5, h6 {
 /* Base Utility Classes */
 .container {
   max-width: var(--max-width);
+  width: 100%;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  /* Fluid gutter (27px desktop, down to 15px on phones). env() is physical by
+     definition, and the padding is symmetric, so this is RTL-safe as written.
+     max(...) keeps content clear of the notch/rounded corners in landscape,
+     which viewport-fit=cover would otherwise let it slide under. */
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+  padding-left: max(var(--container-pad), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--container-pad), env(safe-area-inset-right, 0px));
+}
+
+/* ── Global overflow safety net ─────────────────────────────────────────
+   No media element may be wider than its container. `height: auto` is scoped
+   away from next/image's fill layout (which needs height:100%) and from <svg>
+   (icons carry width/height attributes that CSS would otherwise defeat). */
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+img:not([data-nimg='fill']),
+video,
+canvas {
+  height: auto;
+}
+
+svg {
+  max-width: 100%;
+}
+
+/* Wide-by-design content (tables, code) scrolls inside itself, never on body. */
+table {
+  max-width: 100%;
+}
+
+/* ── Touch targets & iOS input zoom (<=768px) ───────────────────────────
+   Desktop is untouched: these only apply on tablet-portrait and below.
+   1. 44px minimum hit area for real controls (plain inline <a> is left alone
+      so links inside body copy don't gain height).
+   2. iOS Safari zooms the whole page when a focused field's font-size is
+      < 16px. The fluid root is 15px on phones, so `1rem` on an input is 15px
+      and would trigger it — and page modules set 0.88–0.95rem on inputs from
+      a class selector, which outranks an element selector. !important is the
+      only reliable guard here; max() keeps any larger intended size. */
+@media (max-width: 768px) {
+  button,
+  [role='button'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
+  select,
+  summary {
+    min-height: 44px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem) !important;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────
+   The site leans on framer-motion, CSS keyframes (Card), and the transition
+   driven by ScrollReveal. Users who ask for less motion get the end state
+   immediately instead of movement. Durations are near-zero rather than 0 so
+   transitionend/animationend still fire and nothing gets stuck mid-reveal. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

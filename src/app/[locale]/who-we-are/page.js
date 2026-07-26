@@ -6,6 +6,7 @@ import ValuesInfographic from '../../../components/ui/ValuesInfographic';
 import { getPage, getPrinciples, getStats } from '../../../lib/content';
 import en from '../../../../messages/en.json';
 import ar from '../../../../messages/ar.json';
+import BackdropImage from '../../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -35,6 +36,11 @@ export default async function WhoWeAre({ params: { locale } }) {
     <div className={styles.page} dir={isAr ? 'rtl' : 'ltr'}>
       {/* ── 1. HERO ─────────────────────────────────────────── */}
       <section className={styles.hero}>
+        {/* Above the fold: preloaded as this page's LCP candidate. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=2000&q=80"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
 

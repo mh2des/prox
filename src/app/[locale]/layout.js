@@ -27,6 +27,19 @@ export async function generateMetadata({ params: { locale } }) {
   };
 }
 
+// Next 14 injects a default viewport meta, but it is worth being explicit:
+// this is the single tag every responsive rule on the site depends on, and an
+// accidental override anywhere would silently ship a 980px-wide phone layout.
+// Declared as the separate `viewport` export (NOT inside generateMetadata,
+// which Next deprecated for these fields). No maximumScale / userScalable:false
+// — pinch-zoom must stay available. viewportFit: 'cover' pairs with the
+// safe-area padding on .container in globals.css.
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'ar' }];
 }
@@ -67,12 +80,19 @@ export default function RootLayout({ children, params: { locale } }) {
   // Preload only the two above-the-fold weights (body = medium/500,
   // headings = bold/700) so the first paint doesn't wait on the font swap.
   // crossOrigin is required even same-origin because fonts fetch in CORS mode.
-  ReactDOM.preload('/fonts/thmanyah-text-medium.woff2', {
+  //
+  // Locale-aware since the faces were split by script: preloading the combined
+  // files here would have pulled ~158 KB that unicode-range then declined to
+  // use, on top of the subset the page actually needs. An English page now
+  // preloads 26 KB of Latin; an Arabic page preloads its own cut and nothing
+  // Latin, which the `unicode-range` rules would otherwise fetch a beat later.
+  const fontCut = locale === 'ar' ? 'arabic' : 'latin';
+  ReactDOM.preload(`/fonts/thmanyah-medium-${fontCut}.woff2`, {
     as: 'font',
     type: 'font/woff2',
     crossOrigin: 'anonymous',
   });
-  ReactDOM.preload('/fonts/thmanyah-text-bold.woff2', {
+  ReactDOM.preload(`/fonts/thmanyah-bold-${fontCut}.woff2`, {
     as: 'font',
     type: 'font/woff2',
     crossOrigin: 'anonymous',

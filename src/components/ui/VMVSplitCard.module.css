@@ -12,6 +12,12 @@
 
 /* ── Outer card ────────────────────────────────────────────── */
 .card {
+  /* Single source of truth for the centre logo circle. The stacked layout
+     derives its negative margin and the mission panel's top padding from it,
+     so shrinking the circle on a phone can never leave the logo sitting on
+     top of the "Mission" label. */
+  --circle-size: 170px;
+
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   border-radius: 20px;
@@ -26,12 +32,17 @@
 /* ── LEFT PANEL (white — Vision) ───────────────────────────── */
 .left {
   background: #ffffff;
-  padding: 3.25rem 4.5rem 3.25rem 3rem; /* mirror the right panel's 4.5rem space */
-  border-radius: 20px 0 0 20px;
+  /* Logical, not physical: under dir="rtl" the grid flips, this panel lands on
+     the right, and the extra 4.5rem must follow the centre circle with it. */
+  padding-block: 3.25rem;
+  padding-inline: 3rem 4.5rem; /* mirror the right panel's 4.5rem space */
+  border-start-start-radius: 20px;
+  border-end-start-radius: 20px;
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow: hidden;
+  min-width: 0;
 }
 
 .panelChip {
@@ -49,7 +60,7 @@
   color: var(--color-dark);
   line-height: 1.25;
   margin-bottom: 0;
-  padding-right: 2rem; /* offset for center circle */
+  padding-inline-end: 2rem; /* offset for center circle — flips with dir */
 }
 
 .goldBar {
@@ -64,7 +75,7 @@
   color: var(--color-gray-500);
   line-height: 1.75;
   margin-bottom: 1.5rem;
-  padding-right: 2rem; /* offset for center circle */
+  padding-inline-end: 2rem; /* offset for center circle — flips with dir */
 }
 
 
@@ -84,7 +95,8 @@
 .centerRing {
   position: absolute;
   top: 50%; left: 50%;
-  width: 210px; height: 210px;
+  width: calc(var(--circle-size) + 40px);
+  height: calc(var(--circle-size) + 40px);
   border-radius: 50%;
   border: 2px solid rgba(197,160,89,0.35);
   animation: pulseRing 2.4s ease-in-out infinite;
@@ -95,7 +107,7 @@
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 170px; height: 170px;
+  width: var(--circle-size); height: var(--circle-size);
   border-radius: 50%;
   background: linear-gradient(135deg, #139088 0%, #0d6b65 60%, #093d3a 100%);
   border: 5px solid #fff;
@@ -110,12 +122,16 @@
 /* ── RIGHT PANEL (dark teal — Mission) ─────────────────────── */
 .right {
   background: linear-gradient(145deg, #0d2826 0%, #1a3d3b 100%);
-  padding: 3.25rem 3rem 3.25rem 4.5rem; /* increased left padding to 4.5rem */
-  border-radius: 0 20px 20px 0;
+  /* Logical — see .left. 4.5rem is the circle-side inset. */
+  padding-block: 3.25rem;
+  padding-inline: 4.5rem 3rem;
+  border-start-end-radius: 20px;
+  border-end-end-radius: 20px;
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow: hidden;
+  min-width: 0;
 }
 
 .panelChipWhite {
@@ -132,14 +148,15 @@
   font-weight: 800;
   color: #fff;
   line-height: 1.25;
-  padding-left: 2rem; /* offset for center circle */
+  padding-inline-start: 2rem; /* offset for center circle — flips with dir */
 }
 
 .goldBarSmall {
   width: 40px; height: 2.5px;
   background: var(--color-secondary);
   border-radius: 2px;
-  margin: 1rem 0 1.1rem 2rem; /* shifted with padding */
+  margin-block: 1rem 1.1rem;
+  margin-inline-start: 2rem; /* shifted with padding — flips with dir */
 }
 
 .panelTextWhite {
@@ -147,7 +164,7 @@
   color: rgba(255,255,255,0.72);
   line-height: 1.78;
   flex: 1;
-  padding-left: 2rem; /* offset for center circle */
+  padding-inline-start: 2rem; /* offset for center circle — flips with dir */
 }
 
 /* Stats strip at the bottom of right panel */
@@ -162,6 +179,9 @@
 
 .statItem {
   flex: 1;
+  /* Flex items default to min-width:auto; a long CMS label ("Institutions
+     Served") would otherwise refuse to shrink and widen the whole panel. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -187,21 +207,67 @@
   width: 1px;
   height: 36px;
   background: rgba(255,255,255,0.12);
+  flex-shrink: 0; /* a 1px flex item is otherwise free to shrink to nothing */
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 900px) {
+/* Migrated from the off-scale 900px breakpoint onto the project's 1024px
+   step. Below this the card stacks: Vision → logo → Mission. */
+@media (max-width: 1024px) {
   .card {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     overflow: hidden;
     border-radius: 18px;
+    min-height: 0;
   }
-  .left  { border-radius: 18px 18px 0 0; }
-  .right { border-radius: 0 0 18px 18px; }
+  .left {
+    order: 1;
+    border-radius: 18px 18px 0 0;
+    /* The 3rem/4.5rem asymmetry only exists to clear the centre circle in the
+       split layout. Stacked, it burned 112px of a 290px phone screen on
+       padding alone, leaving a 177px measure.
+       The block-end value clears the top half of the logo circle, which
+       straddles the panel boundary: with the old flat 3.25rem the circle sat
+       ~35px on top of the vision title's last line. */
+    padding-block: clamp(1.75rem, 5vw, 3.25rem) calc(var(--circle-size) / 2 + 1.25rem);
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
+  /* The wrap is a zero-height grid row sitting exactly on the seam between the
+     two panels, and it is position:relative — so the BASE rule (absolute,
+     top/left 50%, translate(-50%,-50%)) already centres the circle on that
+     seam. The old override re-declared `position: relative` while leaving the
+     base `left: 50%` in force, which for a relatively-positioned box is a
+     visual offset of 50% of the wrap's width: the logo was shoved half a card
+     to the side and then clipped by `.card { overflow: hidden }`. It also
+     stacked `align-items: center` on a 0-height line against `margin-top:
+     -85px`, dropping the circle 127px up into the Vision panel's text. */
   .centerCircleWrap { width: 100%; height: 0; order: 2; }
-  .centerCircle { top: 0; position: relative; transform: none; margin: -85px auto 0; display: flex; }
-  .centerRing   { display: none; }
-  .left  { order: 1; }
-  .right { order: 3; padding-top: 5rem; }
+  .centerRing { display: none; }
+  .right {
+    order: 3;
+    border-radius: 0 0 18px 18px;
+    /* Half the circle (85px) hangs into this panel. The old flat `padding-top:
+       5rem` was 80px at 768px and 77px at 900px, i.e. always LESS than 85px —
+       the logo overlapped the "MISSION" label. Derive it from the circle. */
+    padding-block: calc(var(--circle-size) / 2 + 1.75rem) clamp(1.75rem, 5vw, 3.25rem);
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  /* The 2rem text insets are pure circle-clearance for the split layout. */
+  .panelTitle,
+  .panelText      { padding-inline-end: 0; }
+  .panelTitleWhite,
+  .panelTextWhite { padding-inline-start: 0; }
+  .goldBarSmall   { margin-inline-start: 0; }
+}
+
+@media (max-width: 480px) {
+  /* A 170px logo is 59% of the card's width on a 320px screen. */
+  .card  { --circle-size: 130px; border-radius: 14px; }
+  .left  { border-radius: 14px 14px 0 0; }
+  .right { border-radius: 0 0 14px 14px; }
+  .missionStats { padding-top: 1.15rem; }
+  .statNum      { font-size: 1.5rem; }
+  .statDivider  { height: 30px; }
 }

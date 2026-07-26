@@ -4,6 +4,7 @@ import styles from './page.module.css';
 import { getTranslations } from '../../../lib/i18n';
 import { getPublishedPosts, getPage } from '../../../lib/content';
 import ScrollReveal from '../../../components/ui/ScrollReveal';
+import BackdropImage from '../../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -92,6 +93,11 @@ export default async function Media({ params: { locale } }) {
         className={styles.hero}
         style={page?.heroImageUrl ? { backgroundImage: `url(${page.heroImageUrl})` } : undefined}
       >
+        {/* Above the fold: preloaded as this page's LCP candidate. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=2000&q=80"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroChip}>
@@ -109,12 +115,16 @@ export default async function Media({ params: { locale } }) {
           <ScrollReveal animation="fadeUp">
             <div className={styles.featuredCard}>
               <div className={styles.featuredImgWrap}>
+                {/* sizes: the card is 2-col above 1024 (half of the 1280
+                    container) and full-bleed below it. The old
+                    "(max-width: 900px) 100vw, 1200px" was off the breakpoint
+                    scale and fetched a 1200px file for a ~610px slot. */}
                 <Image
                   src={featured.image}
                   alt={featured.title}
                   fill
                   priority
-                  sizes="(max-width: 900px) 100vw, 1200px"
+                  sizes="(max-width: 1024px) 100vw, 640px"
                   className={styles.featuredImg}
                 />
                 <div className={styles.featuredImgOverlay} />
@@ -154,11 +164,14 @@ export default async function Media({ params: { locale } }) {
               {gridItems.map((article) => (
                 <Link key={article.key} href={article.href} className={styles.articleCard}>
                   <div className={styles.articleImgWrap}>
+                    {/* sizes: 3-col above 1024, 2-col 601–1024, 1-col at 600
+                        and below. The old single 400px branch under-fetched on
+                        tablets, where a card is ~460px wide. */}
                     <Image
                       src={article.image}
                       alt={article.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, 400px"
+                      sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 400px"
                       className={styles.articleImg}
                     />
                     <div className={styles.articleImgOverlay} />

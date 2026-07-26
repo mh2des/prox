@@ -3,6 +3,7 @@ import styles from './page.module.css';
 import { getTranslations } from '../../lib/i18n';
 import { getPage, getStats, getSectors, getPillars } from '../../lib/content';
 import ScrollReveal from '../../components/ui/ScrollReveal';
+import BackdropImage from '../../components/ui/BackdropImage';
 
 export const revalidate = 3600; // ISR: static + cached, refreshed hourly or on-demand from admin
 
@@ -31,6 +32,13 @@ export default async function Home({ params: { locale } }) {
       {/* ── 1. HERO ─────────────────────────────────────────────
           Hero has its own built-in CSS entrance animation (no ScrollReveal needed) */}
       <section className={styles.hero}>
+        {/* priority: this is the page's LCP element, so it preloads rather
+            than waiting to be discovered. */}
+        <BackdropImage
+          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80"
+          position="center top"
+          priority
+        />
         <div className={styles.heroOverlay} />
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroLabel}>{page?.heroBadge || (isAr ? 'بروإكس الاستشارية' : 'ProEx Advisory')}</div>

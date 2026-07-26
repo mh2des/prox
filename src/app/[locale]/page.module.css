@@ -33,10 +33,33 @@
 }
 
 .home {
+  /* `overflow-x: hidden` forces the OTHER axis to compute to `auto`, which turns
+     this wrapper into a real scroll container and silently kills every
+     position:sticky descendant (.whoLeft below). `clip` guards against sideways
+     overflow without that side effect and is the value that actually pairs with
+     `overflow-y: visible`; `hidden` stays first as the Safari <16 fallback. */
   overflow-x: hidden;
+  overflow-x: clip;
+
+  /* Fluid vertical rhythm for this page's bands. Hits exactly 7rem (126px) at
+     >=1280px so the desktop composition is byte-identical, then steps down
+     instead of staying frozen at 126px on a 320px phone.
+     Measured: 126px @1280 · 118px @1200 · 101px @1024 · 76px @768 · 51px @<=530 */
+  --home-section-y: clamp(3.4rem, 9.85vw, 7rem);
 }
 
 /* ── Shared helpers ───────────────────────────────────────── */
+
+/* Grid/flex items default to `min-width: auto`, which refuses to shrink below
+   their content's min-content size — one long word or a wide stat panel is then
+   enough to push a whole track past the viewport. Opt every track out. */
+.whoGrid > *,
+.workInner > *,
+.insightsInner > *,
+.sectorGrid > * {
+  min-width: 0;
+}
+
 .sectionTitle {
   font-size: clamp(1.8rem, 3.5vw, 2.75rem);
   font-weight: 800;
@@ -56,7 +79,9 @@
 .sectionHeader {
   text-align: center;
   max-width: 720px;
-  margin: 0 auto 3.5rem;
+  /* 63px at >=1280 (identical to the old flat 3.5rem), 38px at 768, 34px on a
+     phone — the flat value ate a fifth of a 360px-wide screen's first fold. */
+  margin: 0 auto clamp(2.25rem, 4.93vw, 3.5rem);
 }
 
 .sectionSubWhite {
@@ -85,9 +110,12 @@
 /* Chips */
 .chipTeal {
   display: inline-block;
+  max-width: 100%;
   background: rgba(19,144,136,0.12);
   color: var(--color-primary);
-  font-size: 0.72rem;
+  /* 12.96px at >=1280 (unchanged), floored at 11px — the fluid root drops to
+     15px on phones, which took this uppercase 0.12em-tracked label to 10.8px. */
+  font-size: max(0.72rem, 11px);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -98,9 +126,11 @@
 
 .chipGold {
   display: inline-block;
+  max-width: 100%;
   background: rgba(197,160,89,0.2);
   color: var(--color-secondary);
-  font-size: 0.72rem;
+  /* See .chipTeal — same 11px floor. */
+  font-size: max(0.72rem, 11px);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -158,12 +188,20 @@
 .hero {
   position: relative;
   min-height: 92vh;
+  /* `vh` on mobile resolves to the LARGE viewport (chrome collapsed), so on
+     first paint — when the URL bar and toolbar are expanded — 92vh is taller
+     than what is actually visible and the CTA row sits under the browser
+     chrome. `svh` is the small viewport and is stable while scrolling (unlike
+     dvh, which would resize the hero mid-scroll). On desktop svh == vh, so
+     >=1280px renders identically. */
+  min-height: 92svh;
   display: flex;
   align-items: center;
+  /* The photo is no longer a CSS background — it is a <BackdropImage>, so it
+     goes through next/image (AVIF + responsive srcset + LCP preload) instead
+     of shipping as a 2000px JPEG to every device. This colour stays as the
+     paint-before-decode backdrop. */
   background-color: #0a1f1e;
-  background-image: url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=80');
-  background-size: cover;
-  background-position: center top;
   color: #fff;
   overflow: hidden;
 }
@@ -171,6 +209,8 @@
 .heroOverlay {
   position: absolute;
   inset: 0;
+  /* Above the backdrop image (z-index 0), below the content (z-index 2). */
+  z-index: 1;
   background: linear-gradient(120deg,
     rgba(10, 31, 30, 0.92) 0%,
     rgba(10, 31, 30, 0.75) 60%,
@@ -204,10 +244,12 @@
 
 .heroLabel {
   display: inline-block;
+  max-width: 100%;
   background: rgba(197,160,89,0.2);
   border: 1px solid rgba(197,160,89,0.4);
   color: var(--color-secondary);
-  font-size: 0.75rem;
+  /* 13.5px at >=1280 (unchanged), floored at 11px on phones. */
+  font-size: max(0.75rem, 11px);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -220,7 +262,10 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  /* The vw term drives everything from ~373px up, so >=1280px is unchanged.
+     The floor was 2.4rem = 36px on a 320px screen, which pushed a two-line
+     title to four lines and made the hero scroll. 2.05rem = 31px fits. */
+  font-size: clamp(2.05rem, 5.5vw, 4.2rem);
   font-weight: 900;
   line-height: 1.1;
   color: #fff;
@@ -292,14 +337,16 @@
 
 /* ── 2. WHO WE ARE ────────────────────────────────────────── */
 .who {
-  padding: 7rem 0;
+  padding: var(--home-section-y) 0;
   background: #fff;
 }
 
 .whoGrid {
   display: grid;
   grid-template-columns: 1fr 1.6fr;
-  gap: 5rem;
+  /* 90px at >=1280 (was a flat 5rem = 90px), narrowing with the viewport so the
+     1200-1281px band does not spend 90px of a 1200px screen on a single gutter. */
+  gap: clamp(2.5rem, 7.05vw, 5rem);
   align-items: flex-start;
 }
 
@@ -322,7 +369,7 @@
 
 /* ── 3. TRACE MODEL ───────────────────────────────────────── */
 .trace {
-  padding: 7rem 0;
+  padding: var(--home-section-y) 0;
   background: linear-gradient(135deg, #0d2826 0%, #1a3d3b 50%, #0d2826 100%);
   position: relative;
   overflow: hidden;
@@ -357,7 +404,10 @@
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
-  padding: 1.75rem 2rem;
+  /* 36px inline at >=1280 (the old flat 2rem), down to ~19px on a 380px phone.
+     At the old flat value the two 36px insets plus the container gutters left a
+     320px screen with ~218px of usable card width. */
+  padding: 1.75rem clamp(1.15rem, 5vw, 2rem);
   transition: background 0.25s, transform 0.25s;
   position: relative;
   z-index: 1;
@@ -391,10 +441,16 @@
 
 .traceBody {
   flex: 1;
+  /* flex item default min-width:auto would let a long CMS title widen the card
+     past the grid track rather than wrapping. */
+  min-width: 0;
 }
 
 .traceLabel {
-  font-size: 0.7rem;
+  /* 12.6px at >=1280 (unchanged), floored at 11px — 0.7rem became 10.5px once
+     the root font dropped to 15px on phones, which is unreadable at 0.15em
+     tracking in all-caps. */
+  font-size: max(0.7rem, 11px);
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -417,21 +473,23 @@
 
 /* ── 4. SECTORS ───────────────────────────────────────────── */
 .sectors {
-  padding: 7rem 0;
+  padding: var(--home-section-y) 0;
   background: var(--color-gray-50);
 }
 
 .sectorGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: clamp(1.25rem, 2.82vw, 2rem);
   margin-top: 1rem;
 }
 
 .sectorCard {
   background: #fff;
   border-radius: 14px;
-  padding: 2.5rem 2rem;
+  /* 45px/36px at >=1280 (the old flat 2.5rem/2rem). The flat inline value left
+     ~215px of text width inside a 320px screen once gutters were subtracted. */
+  padding: clamp(1.75rem, 3.52vw, 2.5rem) clamp(1.25rem, 2.82vw, 2rem);
   box-shadow: 0 2px 20px rgba(0,0,0,0.06);
   border-top: 4px solid var(--color-primary);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -463,7 +521,7 @@
 
 /* ── 5. SELECTED WORK ─────────────────────────────────────── */
 .work {
-  padding: 7rem 0;
+  padding: var(--home-section-y) 0;
   background: #0d2826;
   position: relative;
   overflow: hidden;
@@ -472,7 +530,8 @@
 .workInner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 5rem;
+  /* 90px at >=1280 (was a flat 5rem = 90px). See .whoGrid. */
+  gap: clamp(2.5rem, 7.05vw, 5rem);
   align-items: center;
 }
 
@@ -495,16 +554,21 @@
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
-  padding: 2.5rem;
+  /* 45px at >=1280 (the old flat 2.5rem), ~19px at 320px. */
+  padding: clamp(1.25rem, 3.52vw, 2.5rem);
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
 }
 
 .statItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* space-between alone let the number and the label touch once the panel got
+     narrow; the gap guarantees a gutter between them. */
+  gap: 1rem;
   padding: 1.5rem 0;
 }
 
@@ -514,29 +578,42 @@
 }
 
 .statNum {
-  font-size: 2.5rem;
+  /* 45px at >=1280 (the old flat 2.5rem). Fluid below that so a 4-6 character
+     value ("1,200+") does not consume the whole panel width on a phone. */
+  font-size: clamp(1.9rem, 6vw, 2.5rem);
   font-weight: 900;
   color: var(--color-secondary);
+  /* Never let flex squeeze the figure — it has no break opportunity, so a
+     shrunk track would clip it. The label absorbs the shortfall instead. */
+  flex-shrink: 0;
 }
 
 .statLabel {
   font-size: 0.9rem;
   color: rgba(255,255,255,0.65);
   font-weight: 500;
-  text-align: right;
+  /* `right` is physical: in Arabic the row reverses, the label sits on the LEFT
+     and right-aligning it tore it away from the number. `end` is correct in
+     both directions. */
+  text-align: end;
   max-width: 160px;
+  /* max-width without min-width:0 made this an immovable 160px block: at 320px
+     the panel's inner width is ~250px, so a 100px figure + a 160px label
+     overflowed the card. min-width:0 lets it shrink and wrap instead. */
+  min-width: 0;
 }
 
 /* ── 6. INSIGHTS ──────────────────────────────────────────── */
 .insights {
-  padding: 7rem 0;
+  padding: var(--home-section-y) 0;
   background: #fff;
 }
 
 .insightsInner {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: 5rem;
+  /* 90px at >=1280 (was a flat 5rem = 90px). See .whoGrid. */
+  gap: clamp(2.5rem, 7.05vw, 5rem);
   align-items: center;
 }
 
@@ -556,12 +633,14 @@
 .insightsBadge {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: clamp(0.85rem, 1.76vw, 1.25rem);
   background: var(--color-gray-50);
   border: 1px solid var(--color-gray-200);
   border-radius: 12px;
-  padding: 1.5rem 1.75rem;
+  /* 27px/31.5px at >=1280 (the old flat 1.5rem/1.75rem), fluid below. */
+  padding: 1.5rem clamp(1.1rem, 2.47vw, 1.75rem);
   transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 0;
 }
 .insightsBadge:hover {
   transform: translateX(6px);
@@ -596,9 +675,9 @@
 /* ── 7. FINAL CTA ─────────────────────────────────────────── */
 .cta {
   position: relative;
-  padding: 8rem 0;
+  /* 144px at >=1280 (the old flat 8rem), fluid below. */
+  padding: clamp(3.75rem, 11.26vw, 8rem) 0;
   background-color: #091a19;
-  background-image: url('https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=2000&q=80');
   background-size: cover;
   background-position: center;
   text-align: center;
@@ -666,7 +745,13 @@
   transform: translateY(-2px);
 }
 
-/* ── RESPONSIVE ───────────────────────────────────────────── */
+/* ── RESPONSIVE ─────────────────────────────────────────────
+   Desktop-first. Breakpoints follow the project scale only:
+   1024 · 768 · 600 · 480 · 380. (The 1200 tier is handled by the gap/padding
+   clamp() curves above rather than a query.) Nothing here fires at >=1280px,
+   so the full-width composition is unchanged. */
+
+/* ── 1024 — tablet landscape ───────────────────────────────── */
 @media (max-width: 1024px) {
   .whoGrid,
   .workInner,
@@ -679,13 +764,24 @@
     position: static;
   }
 
+  /* 3 -> 2 -> 1 (the contract collapse). This used to jump straight from three
+     columns to one at 1024, which stretched each sector card to the full 1024px
+     content width — a 60-character measure and a lot of dead space. */
   .sectorGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* ── 768 — tablet portrait ─────────────────────────────────── */
 @media (max-width: 768px) {
-  .hero { min-height: 85vh; }
+  /* The background swap: a 2000px-wide q=80 hero photo is pure data cost on a
+     phone — it sits under a 0.75-0.92 alpha overlay, so a 1200px q=70 crop of
+     the same asset with the same framing is indistinguishable. Only the
+     matching declaration is ever fetched. */
+  .hero {
+    min-height: 85vh;
+    min-height: 85svh;
+  }
 
   .heroActions { flex-direction: column; align-items: flex-start; }
 
@@ -693,9 +789,150 @@
 
   .sectorGrid { grid-template-columns: 1fr; }
 
-  .statPanel { padding: 1.5rem; }
-
   .ctaActions { flex-direction: column; align-items: center; }
 
   .insightsDeco { display: none; }
+
+  /* Every CTA on this page is an <a>, and the global 44px tap-target floor
+     deliberately skips plain anchors so inline links keep their line height.
+     These are buttons in everything but tag name, so they opt in here.
+     max-width also stops a long Arabic label ("اطلب استشارة مجانية") from
+     making an inline-block wider than its column. */
+  .btnPrimary,
+  .btnGold,
+  .btnCtaOutline,
+  .heroBtnPrimary,
+  .heroBtnOutline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    max-width: 100%;
+  }
+}
+
+/* ── 768 landscape — short viewport ────────────────────────── */
+/* A phone held sideways (e.g. 667x375) is only ~375px tall. 85svh of that is
+   319px, but the hero content is ~420px, so the band stopped being a hero and
+   became an awkward overflowing slab. Let it size to its content instead. */
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+  .hero {
+    min-height: 0;
+  }
+
+  .heroInner {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .heroTitle { margin-bottom: 1rem; }
+  .heroSubtitle { margin-bottom: 1.5rem; }
+}
+
+/* ── 600 — phablet / large phone ───────────────────────────── */
+@media (max-width: 600px) {
+  .whoGrid,
+  .workInner,
+  .insightsInner {
+    gap: 2.5rem;
+  }
+
+  .centerAction { margin-top: 2.25rem; }
+
+  .statItem { padding: 1.25rem 0; }
+
+  /* 58px + a 2rem gap was a third of the card's height once the card stacked. */
+  .traceLetter {
+    width: 50px;
+    height: 50px;
+    font-size: 1.6rem;
+  }
+}
+
+/* ── 480 — phone ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero {
+    min-height: 80vh;
+    min-height: 80svh;
+  }
+
+  /* Two shrink-to-fit buttons stacked left-aligned at different widths read as
+     a mistake; full-bleed is the phone convention and guarantees the hit area. */
+  .heroActions { align-items: stretch; }
+  .heroBtnPrimary,
+  .heroBtnOutline {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .btnPrimary,
+  .btnGold,
+  .btnCtaOutline {
+    width: 100%;
+  }
+
+  /* The figure and its label no longer fit on one line: at 320px the panel's
+     inner width is ~250px against a ~100px figure plus a 160px label. Stack. */
+  .statItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .statNum { line-height: 1.2; }
+
+  .statLabel {
+    max-width: 100%;
+    text-align: start;
+  }
+}
+
+/* ── 380 — small phone (iPhone SE, Galaxy S mini) ──────────── */
+@media (max-width: 380px) {
+  .heroInner {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  /* 0.18em/0.12em of tracking on an all-caps pill is ~2px per character; at
+     320px the "PROEX ADVISORY" pill ran to the edge of the container. */
+  .heroLabel {
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .chipTeal,
+  .chipGold {
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .traceLabel { letter-spacing: 0.1em; }
+
+  .heroActions { gap: 0.75rem; }
+
+  /* .goldBarCenter is deliberately excluded — its bottom margin is 0 by design
+     (the section header supplies the space below it). */
+  .goldBar,
+  .workGoldBar { margin-bottom: 1.5rem; }
+}
+
+/* ── Touch devices ─────────────────────────────────────────── */
+/* :hover latches on tap on iOS/Android — a card left mid-translate, or worse an
+   infinite goldPulse/tealGlow keyframe running until the next tap. Neutralise
+   the motion-bearing hover states where there is no real pointer. */
+@media (hover: none) {
+  .traceCard:hover,
+  .sectorCard:hover,
+  .insightsBadge:hover,
+  .btnPrimary:hover,
+  .btnGold:hover,
+  .btnCtaOutline:hover,
+  .heroBtnPrimary:hover,
+  .heroBtnOutline:hover,
+  .traceCard:hover .traceLetter {
+    transform: none;
+    animation: none;
+  }
 }

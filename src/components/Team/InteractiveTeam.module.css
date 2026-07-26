@@ -2,7 +2,11 @@
   display: flex;
   flex-direction: column;
   background-color: #0b151e; /* Dark slate */
+  /* dvh, not vh: on mobile Safari/Chrome `vh` is locked to the viewport with
+     the URL bar retracted, so a 75vh block renders taller than the screen
+     actually is and pushes the carousel below the fold on first paint. */
   min-height: 75vh;
+  min-height: 75dvh;
 }
 
 /* Hero Section (Top) */
@@ -11,7 +15,11 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 4rem 5% 4rem 2%;
+  /* Logical equivalent of `4rem 5% 4rem 2%`. The asymmetric side padding is
+     intentional (text hugs the start edge, portrait gets breathing room), and
+     it has to follow the reading direction to stay that way in Arabic. */
+  padding-block: 4rem;
+  padding-inline: 2% 5%;
   flex: 1;
   position: relative;
   overflow: hidden;
@@ -85,8 +93,13 @@
 /* Right Column (Image Wrapper with arc cutouts) */
 .rightCol {
   position: relative;
-  width: 400px;
-  height: 400px;
+  /* Was a flat 400px with flex-shrink: 0 — an immovable box wider than a small
+     phone's entire content area. min() keeps the exact 400px circle at desktop
+     and lets it track the viewport once there isn't room, while aspect-ratio
+     keeps it perfectly round at every size instead of needing a paired height
+     override in each breakpoint. */
+  width: min(400px, 78vw);
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,13 +270,58 @@
   line-height: 1.3;
 }
 
-@media (max-width: 900px) {
+/* ── RESPONSIVE ────────────────────────────────────────────────────────
+   Widest-first so each narrower block refines the one above it.
+   ──────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* Was 900px — onto the shared scale. The portrait and the bio compete for
+     width well before 900px, so stacking earlier reads better. */
   .hero {
     flex-direction: column-reverse;
     text-align: center;
-    padding: 4rem 5%;
+    padding-inline: 5%;
+    gap: 2.5rem;
   }
   .goldLine { margin: 1.25rem auto 2.5rem; }
-  .rightCol { width: 300px; height: 300px; }
-  .leftCol { display: flex; flex-direction: column; align-items: center; }
+  /* height is now derived from aspect-ratio, so only width is set here. */
+  .rightCol { width: min(300px, 70vw); }
+  .leftCol  { display: flex; flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 768px) {
+  .hero      { padding-block: 3rem; gap: 2rem; }
+  .leaderBio { margin-bottom: 2rem; font-size: 0.92rem; }
+
+  /* 32px is well under the 44px minimum touch target, and this is an <a>, so
+     the global control sizing in globals.css does not reach it. */
+  .linkedinBtn { width: 44px; height: 44px; }
+
+  .track     { gap: 1.75rem; padding: 0 1.25rem; scroll-snap-type: inline mandatory; }
+  .thumbItem { scroll-snap-align: center; }
+  /* The carousel arrows are the only way to page the strip on a phone. */
+  .arrow     { min-width: 44px; padding: 0 0.5rem; font-size: 1.75rem; }
+}
+
+@media (max-width: 600px) {
+  .rightCol       { width: min(260px, 68vw); }
+  .carouselSection { padding: 1.25rem 0; }
+  .track          { gap: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero      { padding-block: 2.5rem; padding-inline: 4%; }
+  .goldLine  { margin: 1rem auto 2rem; }
+  .leaderBio { margin-bottom: 1.75rem; }
+  .track     { gap: 1.25rem; padding: 0 1rem; }
+  .thumbImageContainer { width: 58px; height: 58px; margin-bottom: 0.6rem; }
+  .thumbName { font-size: 0.68rem; max-width: 80px; }
+}
+
+@media (max-width: 380px) {
+  /* Last guard: 78vw of 320px is 250px, and the hero's 4% side padding leaves
+     ~295px of content box, so the circle still clears its container. */
+  .rightCol  { width: min(230px, 72vw); }
+  .track     { gap: 1rem; }
+  .arrow     { padding: 0 0.25rem; font-size: 1.5rem; }
 }

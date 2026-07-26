@@ -9,12 +9,21 @@
   background-color: #ffffff;
   padding: 0.9rem 0;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  /* Live header height (--header-h) now lives in globals.css :root, because
+     the careers tab bar sticks itself directly below this header and needs the
+     same number from outside this subtree. The mobile nav panel below still
+     consumes it to work out how much viewport is left under the bar. */
 }
 
 .headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* Minimum breathing room between the logo and the nav. With
+     justify-content: space-between there is 166px of slack at >=1280px, so
+     this is invisible on desktop — it only bites once the viewport tightens
+     and stops the two blocks from butting up against each other. */
+  gap: 1rem;
 }
 
 /* ---------- Logo ---------- */
@@ -22,10 +31,16 @@
   display: flex;
   align-items: center;
   text-decoration: none;
+  /* Never let the nav squeeze the mark. */
+  flex-shrink: 0;
 }
 
 .logoImg {
-  height: 55px;
+  /* 55px is preserved exactly at >=846px (6.5vw crosses 55 there), then the
+     mark scales down so it stops eating the whole bar on a phone — 50px at
+     768px, 40px at <=615px. width:auto + the intrinsic 600x477 ratio keeps
+     it 1.26x as wide as it is tall. */
+  height: clamp(40px, 6.5vw, 55px);
   width: auto;
   object-fit: contain;
   /* Keep original logo colours on white background */
@@ -35,6 +50,9 @@
 /* ---------- Nav ---------- */
 .nav {
   display: flex;
+  /* Flex items default to min-width:auto, which would let an over-long nav
+     refuse to shrink and push the page sideways instead of clipping. */
+  min-width: 0;
 }
 
 .navList {
@@ -65,6 +83,16 @@
   color: #c5a059;           /* gold on hover */
 }
 
+/* Arabic is a cursive script whose letterforms join. The 0.07em tracking that
+   gives the Latin uppercase nav its wide corporate look just prises the joined
+   glyphs apart in Arabic, and it inflates the RTL nav width for no benefit.
+   Specificity here (0,2,1) deliberately outranks the responsive steps below. */
+[dir="rtl"] .navList a,
+[dir="rtl"] .langBtn,
+[dir="rtl"] .dropdownTrigger span {
+  letter-spacing: normal;
+}
+
 /* Active page — gold underline */
 .activeLink {
   color: #1d2b4f !important;
@@ -90,6 +118,18 @@
   cursor: pointer;
   padding: 0.5rem 0;
   transition: all 0.2s ease;
+  /* This is a real <button> now (it was a <div>, which no keyboard user could
+     reach and no screen reader announced as expandable). Strip the UA button
+     styling so the rendered result is byte-identical to the old <div>:
+     `font: inherit` is what restores the inherited family/size/line-height
+     that the UA `font` shorthand would otherwise clobber. */
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  -webkit-appearance: none;
+          appearance: none;
 }
 
 .dropdownTrigger span {
@@ -119,9 +159,17 @@
 .dropdownMenu {
   position: absolute;
   top: 100%;
-  left: -20px;
+  /* Logical, not `left: -20px`. In RTL the menu must hang off the trigger's
+     inline-start edge, which is its RIGHT edge — the physical version pushed
+     the Arabic menu out the wrong side of the trigger. */
+  inset-inline-start: -20px;
   background-color: #ffffff;
-  min-width: 280px;
+  /* Resolves to a flat 280px at every width the horizontal nav actually
+     appears at (>=1025px). The min()/max-width pair is a guard so a hard
+     280px floor can never be wider than the viewport and shove the page
+     sideways if this menu is ever reused in a narrower context. */
+  min-width: min(280px, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
   list-style: none;
   padding: 0.75rem 0;
   margin: 0;
@@ -157,10 +205,25 @@
   transition: all 0.2s ease !important;
 }
 
-.dropdownMenu a:hover {
+/* Gated on a hover-capable pointer. `:hover` sticks after a tap on touch
+   devices, so without this gate the last-tapped sub-item kept the 2rem indent
+   and the teal colour permanently after the menu reopened. */
+@media (hover: hover) {
+  .dropdownMenu a:hover {
+    background-color: #f8fafc;
+    color: #139088 !important; /* Teal from brand */
+    /* Logical — the nudge has to travel inward (leftward) in RTL. */
+    padding-inline-start: 2rem !important;
+  }
+}
+
+/* Keyboard and touch equivalents of the hover state, since the hover rule above
+   is now pointer-gated. Colour only, no indent — a padding shift under a
+   finger that is already on the row just reads as jank. */
+.dropdownMenu a:focus-visible,
+.dropdownMenu a:active {
   background-color: #f8fafc;
-  color: #139088 !important; /* Teal from brand */
-  padding-left: 2rem !important;
+  color: #139088 !important;
 }
 
 /* ---------- Language switcher ---------- */
@@ -183,26 +246,75 @@
   background: none;
   border: none;
   cursor: pointer;
+  padding: 0;
 }
 
 /* ============================================================
-   RESPONSIVE — Mobile
+   RESPONSIVE
    ============================================================ */
-@media (max-width: 768px) {
+
+/* ---- Small laptop / large tablet landscape ----
+   The eight-item nav (HOME … CONTACT + the AR toggle) measures ~990px at full
+   size: uppercase, 1.05rem, 0.07em tracking, 2rem gaps. The container is only
+   1147px wide at 1200px and 1048px at 1100px, so with the 69px logo the bar
+   runs out of room at ~1090px. Stepping the type and the tracking down one
+   notch here buys ~180px and keeps the full nav usable down to the hamburger
+   handoff at 1024px. Nothing in this block applies at >=1280px. */
+@media (max-width: 1200px) {
+  .navList {
+    gap: 1.4rem;
+  }
+
+  .navList a,
+  .langBtn,
+  .dropdownTrigger span {
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ---- Tablet landscape and down — hamburger panel ----
+   The hamburger handoff used to be at 768px, which left a 320px-wide dead
+   zone (769px–1090px, i.e. every iPad in landscape and every small laptop)
+   where the nav overflowed .headerContainer. Because globals.css puts
+   `overflow-x: clip` on <html>, that overflow did not scroll — CONTACT and
+   the language toggle were simply clipped away and unreachable. Even at the
+   reduced size above, the nav still needs ~860px beside the logo inside a
+   973px container at 1024px, which leaves nothing for the longer Arabic
+   strings, so the panel takes over from 1024px. */
+@media (max-width: 1024px) {
   .mobileMenuBtn {
-    display: block;
+    display: grid;
+    place-items: center;
+    /* The 44px tap-target floor in globals.css only starts at 768px, and the
+       hamburger now appears from 1024px — so state it explicitly. The icon is
+       24px, so this was a 36x26 target before. */
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .nav {
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    /* Symmetric, so RTL-safe either way; logical for consistency. */
+    inset-inline: 0;
     background-color: #ffffff;
     padding: 1rem 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: none;
+    /* The panel is absolutely positioned inside a sticky header, so it has no
+       scrollport. Uncapped, a nav taller than the viewport (phone landscape at
+       430x932 rotated leaves only ~360px, and the eight items plus the open
+       submenu need ~500px) was flatly unreachable — the bottom entries could
+       not be scrolled to by any means. dvh tracks the collapsing mobile URL
+       bar; the vh line above it is the Safari <15.4 fallback. */
+    max-height: calc(100vh - var(--header-h));
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    /* Don't chain the scroll to the page once the panel hits its end. */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .navOpen {
@@ -212,11 +324,66 @@
   .navList {
     flex-direction: column;
     gap: 1rem;
-    padding: 0 1.5rem;
+    /* Was a frozen `0 1.5rem`, which no longer matched .container once the
+       page gutter went fluid — the nav items sat ~8px inboard of the logo on
+       a phone. Using the same token lines them up at every width, and it is
+       symmetric so it stays correct in RTL. */
+    padding: 0 var(--container-pad);
     align-items: flex-start;
   }
 
+  /* Restore the full-size nav type inside the panel. The 1200px step-down
+     above exists purely to fit the horizontal bar; once the items are stacked
+     there is no width pressure, and shrinking them here would be a regression
+     against the previous mobile design. */
+  .navList a,
+  .langBtn,
+  .dropdownTrigger span {
+    font-size: 1.05rem;
+    letter-spacing: 0.07em;
+  }
+
+  /* Tap targets. At this leading a top-level link is only ~33px tall. The
+     overlay buys the missing height without adding padding — padding would
+     push the gold `.activeLink` border-bottom away from the text and break
+     the active-page indicator. The 1rem list gap is wider than the 5.5px each
+     overlay adds per side, so neighbouring hit areas never overlap. */
+  .navList > li > a {
+    position: relative;
+  }
+
+  .navList > li > a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+
+  .langBtn {
+    min-height: 44px;
+    /* Centre the label in the 44px box rather than letting the extra height
+       pile up underneath it, which is what the bare global min-height did. */
+    display: inline-flex;
+    align-items: center;
+  }
+
   .hasDropdown {
+    width: 100%;
+  }
+
+  /* THE fix for the mobile submenu. The base rule is `display: flex;
+     align-items: center; height: 100%` for the desktop bar, where the submenu
+     is position:absolute and therefore out of flow. On mobile the submenu goes
+     position:static, so it re-enters the flow as a FLEX SIBLING of the trigger
+     — the three links laid out in a column to the RIGHT of "About", with the
+     trigger vertically centred against them in a tall dead zone. Stacking the
+     wrapper puts the submenu back underneath its parent where it belongs. */
+  .dropdownWrapper {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
     width: 100%;
   }
 
@@ -224,26 +391,81 @@
     width: 100%;
     justify-content: space-between;
     padding: 0.5rem 0;
+    min-height: 44px;
   }
 
   .dropdownMenu {
     position: static;
-    opacity: 1;
-    visibility: visible;
     transform: none;
     box-shadow: none;
     border: none;
-    padding: 0 0 0 1rem;
+    border-radius: 0;
     min-width: 0;
+    max-width: none;
     width: 100%;
-    display: none; /* Hide by default, show if user wants or just keep it simple */
+
+    /* A teal rail tying the three children to their parent. Logical props so
+       the rail sits on the leading edge in Arabic too. */
+    padding: 0;
+    padding-inline-start: 1rem;
+    margin-inline-start: 0.15rem;
+    border-inline-start: 2px solid rgba(19, 144, 136, 0.22);
+
+    /* Animated open/close instead of a display:none -> block snap. max-height
+       is used rather than the grid 0fr technique because that needs a single
+       collapsible child, and this is a <ul> with one <li> per link.
+       20rem is a generous cap for three items (~150px) — it only bounds the
+       transition, never the layout. visibility keeps the collapsed links out
+       of the tab order, and is delayed on close so it doesn't cut the fade. */
+    display: block;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin-block: 0;
+    transition:
+      max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.2s ease,
+      margin-block 0.3s ease,
+      visibility 0s linear 0.3s;
   }
 
   .dropdownVisible {
-    display: block;
+    max-height: 20rem;
+    opacity: 1;
+    visibility: visible;
+    margin-block: 0.35rem 0.5rem;
+    transition:
+      max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.25s ease 0.05s,
+      margin-block 0.3s ease,
+      visibility 0s linear 0s;
   }
 
   .dropdownMenu a {
-    padding: 0.6rem 0 !important;
+    /* Sub-items read as a quieter tier than the uppercase top-level entries:
+       sentence case, lighter colour, no tracking — but still a full 44px row. */
+    display: flex !important;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.45rem 0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: #4a5568 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  /* The indent-on-hover from the desktop menu is meaningless on touch and
+     causes a jitter when the row is tapped. */
+  .dropdownMenu a:hover {
+    background-color: transparent;
+    padding-inline-start: 0 !important;
+  }
+
+  /* Current sub-page gets the brand colour so the open menu tells you where
+     you are, matching the gold underline the top-level items use. */
+  .dropdownMenu a.subActive {
+    color: var(--color-primary) !important;
+    font-weight: 700 !important;
   }
 }
